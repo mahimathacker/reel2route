@@ -13,7 +13,7 @@ import type { PlanningService } from './modules/planning/planning.service.js'
 type AppDependencies = {
   analysisService: Pick<AnalysisService, 'analyze'>
   ingestionService: Pick<IngestionService, 'ingest'>
-  planningService: Pick<PlanningService, 'create'>
+  planningService: Pick<PlanningService, 'create' | 'get'>
   webOrigin: string
 }
 

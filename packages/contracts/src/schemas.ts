@@ -322,6 +322,8 @@ export const contentAnalysisSchema = z
 
 export const tripPlanningResponseSchema = z
   .object({
+    tripId: z.uuid(),
+    createdAt: z.iso.datetime(),
     analysis: contentAnalysisSchema,
     options: z.array(plannedTripOptionSchema).length(3),
   })

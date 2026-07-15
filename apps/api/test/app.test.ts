@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { createApp } from '../src/app.js'
 
 const unusedAnalysisService = { analyze: vi.fn() }
-const unusedPlanningService = { create: vi.fn() }
+const unusedPlanningService = { create: vi.fn(), get: vi.fn() }
 
 const sourceContent: SourceContent = {
   platform: 'youtube',
@@ -95,7 +95,7 @@ describe('createApp', () => {
     const app = createApp({
       analysisService: unusedAnalysisService,
       ingestionService: { ingest: vi.fn() },
-      planningService: { create },
+      planningService: { create, get: vi.fn() },
       webOrigin: 'http://localhost:5173',
     })
     const preferences = {

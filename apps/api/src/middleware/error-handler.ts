@@ -16,6 +16,7 @@ import {
   GooglePlacesRequestError,
   GooglePlacesResponseError,
 } from '../modules/places/google-places.client.js'
+import { TripNotFoundError } from '../modules/planning/planning.service.js'
 
 type ApiError = {
   error: {
@@ -49,6 +50,11 @@ export const errorHandler: ErrorRequestHandler = (
 
   if (error instanceof YouTubeVideoNotFoundError) {
     sendError(response, 404, 'VIDEO_NOT_FOUND', 'The YouTube video was not found')
+    return
+  }
+
+  if (error instanceof TripNotFoundError) {
+    sendError(response, 404, 'TRIP_NOT_FOUND', 'The saved trip was not found')
     return
   }
 

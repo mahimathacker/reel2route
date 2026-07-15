@@ -10,6 +10,7 @@ const envSchema = z.object({
   OPENAI_API_KEY: z.string().trim().min(1),
   OPENAI_MODEL: z.string().trim().min(1).default('gpt-5-mini'),
   GOOGLE_PLACES_API_KEY: z.string().trim().min(1),
+  DATABASE_PATH: z.string().trim().min(1).default('./data/reel2route.sqlite'),
 })
 
 export const env = envSchema.parse(process.env)

@@ -23,6 +23,21 @@ type CostPort = {
   ): CostEstimate
 }
 type PackingPort = { suggest(preferences: TripPreferences): PackingSuggestion }
+type PersistencePort = {
+  save(
+    sourceUrl: string,
+    preferences: TripPreferences,
+    payload: Pick<TripPlanningResponse, 'analysis' | 'options'>,
+  ): { tripId: string; createdAt: string }
+  findById(tripId: string): TripPlanningResponse | null
+}
+
+export class TripNotFoundError extends Error {
+  constructor() {
+    super('The saved trip was not found')
+    this.name = 'TripNotFoundError'
+  }
+}
 
 export class PlanningService {
   constructor(
@@ -31,6 +46,7 @@ export class PlanningService {
     private readonly tours: TourPort,
     private readonly costs: CostPort,
     private readonly packing: PackingPort,
+    private readonly persistence: PersistencePort,
   ) {}
 
   async create(
@@ -57,6 +73,13 @@ export class PlanningService {
       }
     })
 
-    return tripPlanningResponseSchema.parse({ analysis, options })
+    const identity = this.persistence.save(url, preferences, { analysis, options })
+    return tripPlanningResponseSchema.parse({ ...identity, analysis, options })
+  }
+
+  get(tripId: string): TripPlanningResponse {
+    const trip = this.persistence.findById(tripId)
+    if (trip === null) throw new TripNotFoundError()
+    return trip
   }
 }
