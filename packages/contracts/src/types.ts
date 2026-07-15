@@ -30,6 +30,9 @@ import type {
   sourcePlatformSchema,
   tripPreferencesSchema,
   tripPlanSchema,
+  stopTourRecommendationsSchema,
+  tourMatchedPlanSchema,
+  tourRecommendationSchema,
   transcriptSegmentSchema,
   unavailableSourceFieldSchema,
 } from './schemas.js'
@@ -46,6 +49,11 @@ export type TripPreferences = z.infer<typeof tripPreferencesSchema>
 export type ItineraryStop = z.infer<typeof itineraryStopSchema>
 export type ItineraryDay = z.infer<typeof itineraryDaySchema>
 export type TripPlan = z.infer<typeof tripPlanSchema>
+export type TourRecommendation = z.infer<typeof tourRecommendationSchema>
+export type StopTourRecommendations = z.infer<
+  typeof stopTourRecommendationsSchema
+>
+export type TourMatchedPlan = z.infer<typeof tourMatchedPlanSchema>
 export type ContentAnalysis = z.infer<typeof contentAnalysisSchema>
 export type CostCategory = z.infer<typeof costCategorySchema>
 export type CostLineItem = z.infer<typeof costLineItemSchema>

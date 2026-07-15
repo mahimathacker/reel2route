@@ -187,6 +187,35 @@ export const costedTripPlanSchema = z
   })
   .strict()
 
+export const tourRecommendationSchema = z
+  .object({
+    id: z.string().trim().min(1),
+    title: z.string().trim().min(1).max(200),
+    priceMinor: z.number().int().nonnegative(),
+    currency: z.literal('USD'),
+    durationMinutes: z.number().int().min(30).max(720),
+    rating: z.number().min(0).max(5),
+    source: z.literal('mock'),
+    matchReason: z.string().trim().min(1).max(300),
+  })
+  .strict()
+
+export const stopTourRecommendationsSchema = z
+  .object({
+    day: z.number().int().positive(),
+    placeId: z.string().trim().min(1),
+    tours: z.array(tourRecommendationSchema).max(2),
+  })
+  .strict()
+
+export const tourMatchedPlanSchema = z
+  .object({
+    plan: tripPlanSchema,
+    recommendations: z.array(stopTourRecommendationsSchema),
+    bookabilityScore: z.number().int().min(0).max(100),
+  })
+  .strict()
+
 export const extractedPlaceSchema = z
   .object({
     name: z.string().trim().min(1).max(300),

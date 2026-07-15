@@ -29,6 +29,9 @@ export {
   transcriptSegmentSchema,
   tripPreferencesSchema,
   tripPlanSchema,
+  stopTourRecommendationsSchema,
+  tourMatchedPlanSchema,
+  tourRecommendationSchema,
   unavailableSourceFieldSchema,
 } from './schemas.js'
 
@@ -63,5 +66,8 @@ export type {
   TranscriptSegment,
   TripPreferences,
   TripPlan,
+  StopTourRecommendations,
+  TourMatchedPlan,
+  TourRecommendation,
   UnavailableSourceField,
 } from './types.js'
