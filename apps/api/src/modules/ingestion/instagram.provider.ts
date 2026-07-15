@@ -5,6 +5,14 @@ import type { ParsedContentUrl } from './content-url.js'
 import type { InstagramMetadataClient } from './instagram-metadata.client.js'
 import type { InstagramYtDlpClient } from './instagram-ytdlp.client.js'
 
+const truncate = (value: string | null, maximum: number) => {
+  if (value === null || value.length <= maximum) return value
+
+  const truncated = value.slice(0, maximum)
+  const safe = /[\uD800-\uDBFF]$/.test(truncated) ? truncated.slice(0, -1) : truncated
+  return safe.trimEnd()
+}
+
 export class InstagramProviderUrlError extends Error {
   constructor() {
     super('The Instagram provider received a non-Instagram URL')
@@ -41,12 +49,14 @@ export class InstagramProvider implements ContentProvider {
     }
     const fallback = fallbackResult?.status === 'available' ? fallbackResult.metadata : null
     const metadata = {
-      title: openGraph?.title ?? fallback?.title ?? null,
-      caption:
+      title: truncate(openGraph?.title ?? fallback?.title ?? null, 500),
+      caption: truncate(
         (fallback?.caption?.length ?? 0) > (openGraph?.caption?.length ?? 0)
           ? fallback?.caption ?? null
           : openGraph?.caption ?? null,
-      author: openGraph?.author ?? fallback?.author ?? null,
+        10_000,
+      ),
+      author: truncate(openGraph?.author ?? fallback?.author ?? null, 500),
     }
 
     return {

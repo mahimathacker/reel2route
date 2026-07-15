@@ -90,6 +90,24 @@ describe('InstagramProvider', () => {
     expect(content.author).toBe('Traveller')
   })
 
+  it('normalizes oversized external metadata to the source contract limits', async () => {
+    const provider = new InstagramProvider({
+      fetch: vi.fn().mockResolvedValue({
+        status: 'available',
+        metadata: {
+          title: `Paris guide ${'x'.repeat(600)}`,
+          caption: 'Louvre Museum and Montmartre',
+          author: `Traveller ${'x'.repeat(600)}`,
+        },
+      }),
+    })
+
+    const content = await provider.fetch(parsedInstagramUrl)
+
+    expect(content.title).toHaveLength(500)
+    expect(content.author).toHaveLength(500)
+  })
+
   it('rejects non-Instagram parsed URLs', async () => {
     const metadataFetch = vi.fn<InstagramMetadataClient['fetch']>()
     const provider = new InstagramProvider({ fetch: metadataFetch })
