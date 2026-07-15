@@ -12,7 +12,7 @@ export function OnboardingForm({ initialPreferences, error, onSubmit }: Props) {
   const submit = (event: SubmitEvent<HTMLFormElement>) => { event.preventDefault(); void onSubmit(url.trim(), preferences) }
 
   return <div className="create-view">
-    <section className="hero-copy"><span className="eyebrow">Saved it. Loved it. Now go.</span><h1>Turn a travel reel into a trip you can actually take.</h1><p>Drop a YouTube video or public Instagram Reel. We trace every place to its source, validate it, then shape three plans around you.</p><div className="trust-row"><span>✓ Source evidence</span><span>✓ Real place validation</span><span>✓ Transparent costs</span></div></section>
+    <section className="hero-copy"><span className="eyebrow">Saved it. Loved it. Now go.</span><h1>Turn a travel video into a trip you can actually take.</h1><p>Drop a YouTube video or public Instagram Reel. We trace every place to its source, validate it, then shape three plans around you.</p><div className="trust-row"><span>✓ Source evidence</span><span>✓ Real place validation</span><span>✓ Transparent costs</span></div></section>
     <form className="planner-card" onSubmit={submit}>
       <div className="form-heading"><span className="step-number">01</span><div><h2>Start with the inspiration</h2><p>Public links only. We never download the video.</p></div></div>
       <label className="field-label" htmlFor="content-url">YouTube or Instagram Reel URL</label><div className="url-field"><span>↗</span><input id="content-url" type="url" required placeholder="https://youtube.com/watch?v=..." value={url} onChange={(event) => setUrl(event.target.value)} /></div>
