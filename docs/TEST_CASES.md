@@ -69,8 +69,9 @@ These cases combine automated provider fixtures with live acceptance checks. Rec
 
 Instagram public URLs are intentionally not pinned here because owners can delete or privatize a Reel and Instagram frequently changes unauthenticated access. For the recorded demo, paste a currently public travel Reel and add its exact URL and trip ID below.
 
-**Recorded live URL:** `<add immediately before Loom>`  
-**Recorded trip ID:** `<add immediately before Loom>`
+**Recorded live URL:** https://www.instagram.com/reel/DasWAlTA6J1/  
+**Recorded trip ID:** `199e9b4f-2622-48e4-b3b8-0024406d7cc1`  
+**Observed live result (July 15, 2026):** Instagram metadata and the optional `yt-dlp` fallback were both reached successfully. The available text established Paris as a broad destination but named no independently visitable places, so the app persisted the analysis and displayed its insufficient-evidence state instead of inventing an itinerary, tour matches, or a complete trip cost.
 
 **Automated fixture:** a public Reel page with Open Graph metadata. The provider normalizes this to platform `instagram`, caption text, canonical URL, and an empty transcript. When that metadata is blocked or sparse, an optional local `yt-dlp --skip-download` adapter attempts to retrieve richer caption metadata without downloading media.
 
