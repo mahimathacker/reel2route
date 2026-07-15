@@ -45,7 +45,7 @@ Output: 40,000 × 1,500 =  60,000,000 tokens → $120
 Total:                                              $180
 ```
 
-This assumes one structured extraction call per trip. The deterministic persona, itinerary, cost, tour, packing, and bookability stages add no LLM tokens. Retries, unusually long transcripts, cached-input discounts, and future model-price changes are excluded.
+This assumes one structured LLM extraction call per generated trip. The deterministic persona, itinerary, cost, tour, packing, and bookability stages add no LLM tokens. If a future version uses additional LLM calls for itinerary generation or retry recovery, those tokens should be added separately. Unusually long transcripts, cached-input discounts, and future model-price changes are excluded.
 
 ### YouTube Data API
 
@@ -71,7 +71,7 @@ The exact bill depends on billing account, region, negotiated discounts, field m
 
 ### Tours and Instagram
 
-The submitted tour catalogue is local JSON, so it has no provider-call fee. A real affiliate integration may be free at request time but introduce approval requirements, rate limits, attribution rules, commission economics, and availability risk; those are commercial terms rather than assumed API costs.
+Because the assignment permits a mocked tour catalogue, the submitted version uses local JSON and has $0 tour API call cost. A live Viator or GetYourGuide integration would require separate review of API access, commercial terms, rate limits, attribution requirements, commission economics, and availability risk.
 
 Unauthenticated Instagram page fetching has no published per-request charge, but it is operationally fragile. Production could incur proxy, retry, anti-abuse, or licensed-content-provider costs. Those are not silently counted as zero infrastructure cost—they are simply unknown until a compliant ingestion route is selected.
 
