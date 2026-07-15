@@ -9,7 +9,10 @@ import type {
   healthResponseSchema,
   ingestContentRequestSchema,
   missingInformationSchema,
+  placeCandidateSchema,
   placeCategorySchema,
+  placeResolutionStatusSchema,
+  resolvedPlaceSchema,
   sourceContentSchema,
   sourceEvidenceSchema,
   sourcePlatformSchema,
@@ -25,6 +28,9 @@ export type ContentExtraction = z.infer<typeof contentExtractionSchema>
 export type ExtractedPlace = z.infer<typeof extractedPlaceSchema>
 export type ExtractedActivity = z.infer<typeof extractedActivitySchema>
 export type MissingInformation = z.infer<typeof missingInformationSchema>
+export type PlaceCandidate = z.infer<typeof placeCandidateSchema>
+export type PlaceResolutionStatus = z.infer<typeof placeResolutionStatusSchema>
+export type ResolvedPlace = z.infer<typeof resolvedPlaceSchema>
 export type HealthResponse = z.infer<typeof healthResponseSchema>
 export type IngestContentRequest = z.infer<typeof ingestContentRequestSchema>
 export type SourceContent = z.infer<typeof sourceContentSchema>

@@ -23,6 +23,12 @@ export const placeCategorySchema = z.enum([
   'other',
 ])
 
+export const placeResolutionStatusSchema = z.enum([
+  'resolved',
+  'ambiguous',
+  'not_found',
+])
+
 export const ingestContentRequestSchema = z
   .object({
     url: z.string().trim().pipe(z.url()),
@@ -119,5 +125,32 @@ export const contentExtractionSchema = z
     activities: z.array(extractedActivitySchema).max(30),
     vibes: z.array(z.string().trim().min(1).max(100)).max(10),
     missingInformation: z.array(missingInformationSchema).max(6),
+  })
+  .strict()
+
+export const placeCandidateSchema = z
+  .object({
+    placeId: z.string().trim().min(1),
+    displayName: z.string().trim().min(1),
+    formattedAddress: z.string().trim().min(1).nullable(),
+  })
+  .strict()
+
+export const resolvedPlaceSchema = z
+  .object({
+    source: extractedPlaceSchema,
+    status: placeResolutionStatusSchema,
+    resolutionConfidence: confidenceLevelSchema.nullable(),
+    placeId: z.string().trim().min(1).nullable(),
+    displayName: z.string().trim().min(1).nullable(),
+    formattedAddress: z.string().trim().min(1).nullable(),
+    latitude: z.number().min(-90).max(90).nullable(),
+    longitude: z.number().min(-180).max(180).nullable(),
+    primaryType: z.string().trim().min(1).nullable(),
+    types: z.array(z.string().trim().min(1)),
+    rating: z.number().min(0).max(5).nullable(),
+    priceLevel: z.number().int().min(0).max(4).nullable(),
+    googleMapsUri: z.url().nullable(),
+    alternatives: z.array(placeCandidateSchema).max(3),
   })
   .strict()

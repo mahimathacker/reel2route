@@ -9,6 +9,7 @@ const envSchema = z.object({
   YOUTUBE_API_KEY: z.string().trim().min(1),
   OPENAI_API_KEY: z.string().trim().min(1).optional(),
   OPENAI_MODEL: z.string().trim().min(1).default('gpt-5-mini'),
+  GOOGLE_PLACES_API_KEY: z.string().trim().min(1).optional(),
 })
 
 export const env = envSchema.parse(process.env)
