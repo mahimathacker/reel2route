@@ -58,15 +58,18 @@ reel2route/
 - A [YouTube Data API v3 key](https://developers.google.com/youtube/v3/getting-started)
 - An [OpenAI API key](https://platform.openai.com/api-keys)
 - A [Google Places API key](https://developers.google.com/maps/documentation/places/web-service/get-api-key) with Places API (New) enabled and billing configured
+- Optional: [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) for Instagram metadata fallback (`brew install yt-dlp` on macOS)
 
 ### Setup
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/mahimathacker/reel2route.git
 cd reel2route
 npm install
 cp .env.example .env
 ```
+
+If you use nvm, run `nvm use` before `npm install`. The project expects Node.js 24 or newer because it uses Node's built-in SQLite API.
 
 Fill in the three API keys in `.env`, then start both workspaces:
 
@@ -172,6 +175,6 @@ Tests cover URL parsing, provider fallbacks, prompt/output validation, place res
 - Explain why each unscheduled place was excluded, for example lower confidence, overlapping experience, distance, pace, or day-capacity constraints.
 - Preserve useful day groupings from chaptered videos while still adapting them to the user's requested duration and pace.
 - Add live dates, airport, party size, and baggage inputs only when the user asks for booking-grade estimates.
-- Tour recommendations are sourced from a mocked catalogue, as allowed by the assignment. They are treated as bookable-style demo inventory, not live availability. In production, this layer would be replaced by Viator or GetYourGuide inventory.
+- Replace the mocked tour catalogue with live Viator or GetYourGuide inventory once API access, attribution rules, and commercial terms are confirmed.
 
 The 100K-MAU operating model is documented in [docs/COST_ESTIMATE.md](docs/COST_ESTIMATE.md).
