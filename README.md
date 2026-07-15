@@ -149,7 +149,17 @@ Tests cover URL parsing, provider fallbacks, prompt/output validation, place res
 - Place resolution uses text search and a simple ambiguity policy; similarly named venues can require user confirmation in a production product.
 - Flight, accommodation, food, and local-transport amounts are persona heuristics, not dated inventory. Tours are realistic mock records and are not bookable.
 - The five-question brief omits travel dates and party size. The UI reports those gaps instead of inventing precision; totals are per person.
+- Onboarding deliberately remains at the five-question maximum. The current itinerary ranks validated places using persona, Google rating and price tier, requested pace, and proximity; it does not collect explicit interests such as food, art, history, nightlife, or nature. Content vibes inform the displayed analysis but are not yet a hard itinerary preference.
+- When a user requests fewer days than the source describes, persona capacity determines which validated places fit. Excluded places remain visible, but the product does not yet provide a detailed per-place exclusion reason.
 - There is no authentication, background job queue, retry dashboard, or multi-instance database strategy because the assignment is local-only.
-- Public content, model output, API pricing, and place records change. Re-run the three documented cases immediately before recording the walkthrough.
+
+## Possible next improvements
+
+- Add optional post-generation interest chips—such as art, food, history, neighbourhoods, viewpoints, and relaxation—without expanding the required onboarding beyond five questions.
+- Combine source confidence, mention count, title/description evidence, persona-category affinity, Google attributes, and category diversity into an explainable place-selection score.
+- Explain why each unscheduled place was excluded, for example lower confidence, overlapping experience, distance, pace, or day-capacity constraints.
+- Preserve useful day groupings from chaptered videos while still adapting them to the user's requested duration and pace.
+- Add live dates, airport, party size, and baggage inputs only when the user asks for booking-grade estimates.
+- Tour recommendations are sourced from a mocked catalogue, as allowed by the assignment. They are treated as bookable-style demo inventory, not live availability. In production, this layer would be replaced by Viator or GetYourGuide inventory.
 
 The 100K-MAU operating model is documented in [docs/COST_ESTIMATE.md](docs/COST_ESTIMATE.md).
