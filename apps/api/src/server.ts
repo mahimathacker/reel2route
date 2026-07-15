@@ -1,7 +1,13 @@
 import { app } from './app.js'
 import { env } from './config/env.js'
 
-const server = app.listen(env.PORT, () => {
+const server = app.listen(env.PORT, (error) => {
+  if (error) {
+    console.error(`Failed to start the API on port ${env.PORT}`, error)
+    process.exitCode = 1
+    return
+  }
+
   console.log(`Reel2Route API listening on http://localhost:${env.PORT}`)
 })
 
