@@ -6,6 +6,8 @@ import { PlaceResolver } from '../src/modules/places/place-resolver.js'
 const source: ExtractedPlace = {
   name: 'City Palace',
   category: 'landmark',
+  role: 'independent_place',
+  parentPlaceName: null,
   context: 'A heritage stop',
   evidence: [{ source: 'title', text: 'City Palace guide', timestampSeconds: null }],
   confidence: 'high',

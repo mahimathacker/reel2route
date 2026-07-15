@@ -29,6 +29,8 @@ const extraction: ContentExtraction = {
     {
       name: 'City Palace',
       category: 'landmark',
+      role: 'independent_place',
+      parentPlaceName: null,
       context: 'Suggested as the first stop',
       evidence: [
         {

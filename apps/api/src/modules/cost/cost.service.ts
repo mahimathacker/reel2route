@@ -49,16 +49,38 @@ const normalizeLocation = (value: string) =>
 const countryPart = (value: string) =>
   normalizeLocation(value.split(',').at(-1) ?? value)
 
+type FlightBand = 'same_destination' | 'domestic' | 'international' | 'unknown'
+
+const flightBand = (origin: string, destination: string | null): FlightBand => {
+  if (destination === null) return 'unknown'
+  if (normalizeLocation(origin) === normalizeLocation(destination)) {
+    return 'same_destination'
+  }
+  return countryPart(origin) === countryPart(destination)
+    ? 'domestic'
+    : 'international'
+}
+
 const flightEstimate = (
   origin: string,
   destination: string | null,
   rates: PersonaRates,
 ) => {
-  if (destination === null) return rates.internationalFlight
-  if (normalizeLocation(origin) === normalizeLocation(destination)) return 0
-  return countryPart(origin) === countryPart(destination)
-    ? rates.domesticFlight
-    : rates.internationalFlight
+  const band = flightBand(origin, destination)
+  if (band === 'same_destination') return 0
+  if (band === 'domestic') return rates.domesticFlight
+  return rates.internationalFlight
+}
+
+const flightAssumption = (origin: string, destination: string | null) => {
+  const band = flightBand(origin, destination)
+  const labels: Record<FlightBand, string> = {
+    same_destination: 'same destination; no flight added',
+    domestic: 'domestic route band',
+    international: 'international route band',
+    unknown: 'unknown destination; conservative international route band',
+  }
+  return `${origin} → ${destination ?? 'unknown destination'} is treated as a ${labels[band]}. Dates, airports, baggage, and booking window are unknown.`
 }
 
 const roomShare = (groupType: TripPreferences['groupType']) =>
@@ -97,8 +119,7 @@ export class CostService {
         label: 'Indicative return flight',
         amountMinor: flightEstimate(preferences.origin, destination, rates),
         confidence: 'low' as const,
-        assumption:
-          'Route-based mock estimate for a return economy fare; dates, baggage, and booking window are unknown.',
+        assumption: flightAssumption(preferences.origin, destination),
       },
       {
         category: 'accommodation' as const,

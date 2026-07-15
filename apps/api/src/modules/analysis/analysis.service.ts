@@ -32,7 +32,7 @@ export class AnalysisService {
     const source = await this.ingestion.ingest(url)
     const extraction = await this.extraction.extract(source)
     const resolvedPlaces = await this.resolution.resolveAll(
-      extraction.places,
+      extraction.places.filter(({ role }) => role === 'independent_place'),
       extraction.destinationGuess,
     )
 

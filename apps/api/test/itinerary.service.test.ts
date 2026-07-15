@@ -14,6 +14,8 @@ const resolvedPlace = (
   source: {
     name,
     category: 'landmark',
+    role: 'independent_place',
+    parentPlaceName: null,
     context: `${name} appears in the reel`,
     evidence: [{ source: 'transcript', text: name, timestampSeconds: 10 }],
     confidence: 'high',

@@ -110,6 +110,39 @@ describe('TourMatcherService', () => {
     ).toBe(false)
   })
 
+  it('matches Louvre inventory to the selected persona and budget', () => {
+    const budgetPlan = {
+      ...plan(),
+      destination: 'Paris, France',
+      persona: new PersonaService().generate({
+        origin: 'London, United Kingdom',
+        days: 1,
+        budgetRange: 'budget',
+        groupType: 'solo',
+        pace: 'balanced',
+      })[0]!,
+      days: [
+        {
+          ...plan().days[0]!,
+          stops: [
+            {
+              ...plan().days[0]!.stops[0]!,
+              placeId: 'louvre',
+              name: 'Louvre Museum',
+              category: 'attraction' as const,
+            },
+          ],
+        },
+      ],
+    }
+
+    const tours = new TourMatcherService(catalogue).matchPlan(budgetPlan)
+      .recommendations[0]?.tours
+
+    expect(tours?.map(({ id }) => id)).toEqual(['par-louvre-entry'])
+    expect(tours?.some(({ id }) => id === 'par-louvre-private')).toBe(false)
+  })
+
   it('returns at most two recommendations per stop', () => {
     const result = new TourMatcherService(catalogue).matchPlan(plan())
     expect(result.recommendations.every(({ tours }) => tours.length <= 2)).toBe(

@@ -17,6 +17,8 @@ These cases combine automated provider fixtures with live acceptance checks. Rec
     {
       "name": "Louvre Museum",
       "category": "attraction",
+      "role": "independent_place",
+      "parentPlaceName": null,
       "confidence": "high",
       "mentionCount": 2,
       "evidence": [
@@ -69,6 +71,8 @@ Instagram public URLs are intentionally not pinned here because owners can delet
     {
       "name": "Hawa Mahal",
       "category": "landmark",
+      "role": "independent_place",
+      "parentPlaceName": null,
       "confidence": "high",
       "mentionCount": 1,
       "evidence": [
@@ -82,6 +86,8 @@ Instagram public URLs are intentionally not pinned here because owners can delet
     {
       "name": "City Palace Jaipur",
       "category": "attraction",
+      "role": "independent_place",
+      "parentPlaceName": null,
       "confidence": "medium",
       "mentionCount": 1,
       "evidence": [

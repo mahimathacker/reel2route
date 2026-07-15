@@ -3,6 +3,7 @@ import { dirname } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
 
 import {
+  tripPreferencesSchema,
   tripPlanningResponseSchema,
   type TripPlanningResponse,
   type TripPreferences,
@@ -14,6 +15,7 @@ type TripPayload = Pick<TripPlanningResponse, 'analysis' | 'options'>
 const storedRowSchema = z.object({
   id: z.uuid(),
   created_at: z.iso.datetime(),
+  preferences_json: z.string(),
   payload_json: z.string(),
 })
 
@@ -45,7 +47,7 @@ export class TripRepository {
       VALUES (?, ?, ?, ?, ?)
     `)
     this.#find = database.prepare(
-      'SELECT id, created_at, payload_json FROM trips WHERE id = ?',
+      'SELECT id, created_at, preferences_json, payload_json FROM trips WHERE id = ?',
     )
   }
 
@@ -73,6 +75,9 @@ export class TripRepository {
     return tripPlanningResponseSchema.parse({
       tripId: stored.id,
       createdAt: stored.created_at,
+      preferences: tripPreferencesSchema.parse(
+        JSON.parse(stored.preferences_json) as unknown,
+      ),
       ...JSON.parse(stored.payload_json),
     })
   }

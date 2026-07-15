@@ -54,4 +54,51 @@ describe('AnalysisService', () => {
     )
     expect(resolveAll).not.toHaveBeenCalled()
   })
+
+  it('resolves only independently visitable places', async () => {
+    const evidence = [{ source: 'transcript' as const, text: 'Visit the Louvre and see the Mona Lisa', timestampSeconds: 10 }]
+    const places: ContentExtraction['places'] = [
+      {
+        name: 'Louvre Museum',
+        category: 'attraction',
+        role: 'independent_place',
+        parentPlaceName: null,
+        context: 'A museum visit',
+        evidence,
+        confidence: 'high',
+        mentionCount: 1,
+      },
+      {
+        name: 'Mona Lisa',
+        category: 'other',
+        role: 'within_place',
+        parentPlaceName: 'Louvre Museum',
+        context: 'An artwork inside the Louvre',
+        evidence,
+        confidence: 'high',
+        mentionCount: 1,
+      },
+      {
+        name: 'Paris',
+        category: 'neighbourhood',
+        role: 'destination_label',
+        parentPlaceName: null,
+        context: 'The overall destination',
+        evidence,
+        confidence: 'high',
+        mentionCount: 1,
+      },
+    ]
+    const richExtraction = { ...extraction, destinationGuess: 'Paris, France', places }
+    const resolveAll = vi.fn().mockResolvedValue([] as ResolvedPlace[])
+    const service = new AnalysisService(
+      { ingest: vi.fn().mockResolvedValue(source) },
+      { extract: vi.fn().mockResolvedValue(richExtraction) },
+      { resolveAll },
+    )
+
+    await service.analyze('https://youtu.be/dQw4w9WgXcQ')
+
+    expect(resolveAll).toHaveBeenCalledWith([places[0]], 'Paris, France')
+  })
 })

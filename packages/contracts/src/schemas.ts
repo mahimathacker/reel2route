@@ -247,6 +247,8 @@ export const extractedPlaceSchema = z
   .object({
     name: z.string().trim().min(1).max(300),
     category: placeCategorySchema,
+    role: z.enum(['independent_place', 'within_place', 'destination_label']),
+    parentPlaceName: z.string().trim().min(1).max(300).nullable(),
     context: z.string().trim().min(1).max(500),
     evidence: z.array(sourceEvidenceSchema).min(1).max(5),
     confidence: confidenceLevelSchema,
@@ -326,6 +328,7 @@ export const tripPlanningResponseSchema = z
   .object({
     tripId: z.uuid(),
     createdAt: z.iso.datetime(),
+    preferences: tripPreferencesSchema,
     analysis: contentAnalysisSchema,
     options: z.array(plannedTripOptionSchema).length(3),
   })

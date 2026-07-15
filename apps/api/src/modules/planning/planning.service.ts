@@ -74,7 +74,12 @@ export class PlanningService {
     })
 
     const identity = this.persistence.save(url, preferences, { analysis, options })
-    return tripPlanningResponseSchema.parse({ ...identity, analysis, options })
+    return tripPlanningResponseSchema.parse({
+      ...identity,
+      preferences,
+      analysis,
+      options,
+    })
   }
 
   get(tripId: string): TripPlanningResponse {

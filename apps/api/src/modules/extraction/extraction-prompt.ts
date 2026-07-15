@@ -37,6 +37,11 @@ export const EXTRACTION_SYSTEM_PROMPT = `You extract travel facts from social co
 
 Rules:
 - Extract only places and activities supported by the supplied source.
+- Classify a venue that can be visited independently as independent_place.
+- Classify an exhibit, artwork, room, dish, or feature inside another venue as within_place and name its parent venue.
+- Classify a city, region, or country used only as the overall destination as destination_label.
+- Never represent a within_place item or destination_label as an independent itinerary stop.
+- Put experiences such as seeing an artwork in activities and link them to the parent venue with placeName.
 - Preserve the exact supporting snippet and its source type as evidence.
 - Use transcript timestamps when available; otherwise use null.
 - Count distinct mentions of each place across all supplied sources.
