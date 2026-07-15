@@ -22,6 +22,7 @@
     "typescript-eslint": "^8.64.0"
   },
   "dependencies": {
+    "@reel2route/contracts": "^0.1.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "zod": "^4.4.3"

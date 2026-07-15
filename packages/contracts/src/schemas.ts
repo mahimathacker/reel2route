@@ -12,6 +12,13 @@ export const evidenceSourceSchema = z.enum([
 
 export const confidenceLevelSchema = z.enum(['high', 'medium', 'low'])
 
+export const healthResponseSchema = z
+  .object({
+    status: z.literal('ok'),
+    service: z.literal('reel2route-api'),
+  })
+  .strict()
+
 export const sourceEvidenceSchema = z
   .object({
     source: evidenceSourceSchema,
