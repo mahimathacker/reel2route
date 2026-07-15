@@ -2,6 +2,7 @@ import type { z } from 'zod'
 
 import type {
   confidenceLevelSchema,
+  budgetRangeSchema,
   contentAnalysisSchema,
   contentExtractionSchema,
   evidenceSourceSchema,
@@ -10,13 +11,18 @@ import type {
   healthResponseSchema,
   ingestContentRequestSchema,
   missingInformationSchema,
+  groupTypeSchema,
+  pacePreferenceSchema,
   placeCandidateSchema,
   placeCategorySchema,
   placeResolutionStatusSchema,
+  personaIdSchema,
+  personaProfileSchema,
   resolvedPlaceSchema,
   sourceContentSchema,
   sourceEvidenceSchema,
   sourcePlatformSchema,
+  tripPreferencesSchema,
   transcriptSegmentSchema,
   unavailableSourceFieldSchema,
 } from './schemas.js'
@@ -24,6 +30,12 @@ import type {
 export type SourcePlatform = z.infer<typeof sourcePlatformSchema>
 export type EvidenceSource = z.infer<typeof evidenceSourceSchema>
 export type ConfidenceLevel = z.infer<typeof confidenceLevelSchema>
+export type BudgetRange = z.infer<typeof budgetRangeSchema>
+export type GroupType = z.infer<typeof groupTypeSchema>
+export type PacePreference = z.infer<typeof pacePreferenceSchema>
+export type PersonaId = z.infer<typeof personaIdSchema>
+export type PersonaProfile = z.infer<typeof personaProfileSchema>
+export type TripPreferences = z.infer<typeof tripPreferencesSchema>
 export type ContentAnalysis = z.infer<typeof contentAnalysisSchema>
 export type PlaceCategory = z.infer<typeof placeCategorySchema>
 export type ContentExtraction = z.infer<typeof contentExtractionSchema>

@@ -29,6 +29,40 @@ export const placeResolutionStatusSchema = z.enum([
   'not_found',
 ])
 
+export const budgetRangeSchema = z.enum(['budget', 'moderate', 'premium'])
+export const groupTypeSchema = z.enum(['solo', 'couple', 'friends', 'family'])
+export const pacePreferenceSchema = z.enum(['relaxed', 'balanced', 'packed'])
+export const personaIdSchema = z.enum([
+  'budget_explorer',
+  'comfort_traveller',
+  'premium_escape',
+])
+
+export const tripPreferencesSchema = z
+  .object({
+    origin: z.string().trim().min(2).max(200),
+    days: z.number().int().min(1).max(14),
+    budgetRange: budgetRangeSchema,
+    groupType: groupTypeSchema,
+    pace: pacePreferenceSchema,
+  })
+  .strict()
+
+export const personaProfileSchema = z
+  .object({
+    id: personaIdSchema,
+    name: z.string().trim().min(1).max(100),
+    summary: z.string().trim().min(1).max(300),
+    accommodationStyle: z.string().trim().min(1).max(150),
+    transportStyle: z.string().trim().min(1).max(150),
+    diningStyle: z.string().trim().min(1).max(150),
+    activityPricePreference: budgetRangeSchema,
+    dailyStopTarget: z.number().int().min(2).max(7),
+    fitScore: z.number().int().min(0).max(100),
+    reason: z.string().trim().min(1).max(500),
+  })
+  .strict()
+
 export const ingestContentRequestSchema = z
   .object({
     url: z.string().trim().pipe(z.url()),
