@@ -3,10 +3,13 @@ import cors from 'cors'
 import express from 'express'
 
 import { errorHandler } from './middleware/error-handler.js'
+import { createAnalysisRouter } from './modules/analysis/analysis.router.js'
+import type { AnalysisService } from './modules/analysis/analysis.service.js'
 import { createIngestionRouter } from './modules/ingestion/ingestion.router.js'
 import type { IngestionService } from './modules/ingestion/ingestion.service.js'
 
 type AppDependencies = {
+  analysisService: Pick<AnalysisService, 'analyze'>
   ingestionService: Pick<IngestionService, 'ingest'>
   webOrigin: string
 }
@@ -16,7 +19,11 @@ const healthResponse = healthResponseSchema.parse({
   service: 'reel2route-api',
 })
 
-export const createApp = ({ ingestionService, webOrigin }: AppDependencies) => {
+export const createApp = ({
+  analysisService,
+  ingestionService,
+  webOrigin,
+}: AppDependencies) => {
   const app = express()
 
   app.disable('x-powered-by')
@@ -26,6 +33,7 @@ export const createApp = ({ ingestionService, webOrigin }: AppDependencies) => {
   app.get('/api/health', (_request, response) => {
     response.status(200).json(healthResponse)
   })
+  app.use('/api/analyses', createAnalysisRouter(analysisService))
   app.use('/api/ingestions', createIngestionRouter(ingestionService))
   app.use(errorHandler)
 

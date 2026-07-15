@@ -2,6 +2,7 @@ import type { z } from 'zod'
 
 import type {
   confidenceLevelSchema,
+  contentAnalysisSchema,
   contentExtractionSchema,
   evidenceSourceSchema,
   extractedActivitySchema,
@@ -23,6 +24,7 @@ import type {
 export type SourcePlatform = z.infer<typeof sourcePlatformSchema>
 export type EvidenceSource = z.infer<typeof evidenceSourceSchema>
 export type ConfidenceLevel = z.infer<typeof confidenceLevelSchema>
+export type ContentAnalysis = z.infer<typeof contentAnalysisSchema>
 export type PlaceCategory = z.infer<typeof placeCategorySchema>
 export type ContentExtraction = z.infer<typeof contentExtractionSchema>
 export type ExtractedPlace = z.infer<typeof extractedPlaceSchema>

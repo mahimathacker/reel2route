@@ -1,5 +1,6 @@
 export {
   confidenceLevelSchema,
+  contentAnalysisSchema,
   contentExtractionSchema,
   evidenceSourceSchema,
   extractedActivitySchema,
@@ -20,6 +21,7 @@ export {
 
 export type {
   ConfidenceLevel,
+  ContentAnalysis,
   ContentExtraction,
   EvidenceSource,
   ExtractedActivity,

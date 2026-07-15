@@ -154,3 +154,11 @@ export const resolvedPlaceSchema = z
     alternatives: z.array(placeCandidateSchema).max(3),
   })
   .strict()
+
+export const contentAnalysisSchema = z
+  .object({
+    source: sourceContentSchema,
+    extraction: contentExtractionSchema,
+    resolvedPlaces: z.array(resolvedPlaceSchema).max(30),
+  })
+  .strict()

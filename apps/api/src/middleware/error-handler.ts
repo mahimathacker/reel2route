@@ -1,6 +1,7 @@
 import type { ErrorRequestHandler } from 'express'
 import { ZodError } from 'zod'
 
+import { ContentExtractionError } from '../modules/extraction/openai-content.extractor.js'
 import { UnsupportedContentUrlError } from '../modules/ingestion/content-url.js'
 import {
   ContentProviderIdentityMismatchError,
@@ -11,6 +12,10 @@ import {
   YouTubeMetadataResponseError,
   YouTubeVideoNotFoundError,
 } from '../modules/ingestion/youtube-metadata.client.js'
+import {
+  GooglePlacesRequestError,
+  GooglePlacesResponseError,
+} from '../modules/places/google-places.client.js'
 
 type ApiError = {
   error: {
@@ -56,6 +61,29 @@ export const errorHandler: ErrorRequestHandler = (
       502,
       'YOUTUBE_UNAVAILABLE',
       'YouTube metadata is temporarily unavailable',
+    )
+    return
+  }
+
+  if (error instanceof ContentExtractionError) {
+    sendError(
+      response,
+      502,
+      'EXTRACTION_UNAVAILABLE',
+      'Content extraction is temporarily unavailable',
+    )
+    return
+  }
+
+  if (
+    error instanceof GooglePlacesRequestError ||
+    error instanceof GooglePlacesResponseError
+  ) {
+    sendError(
+      response,
+      502,
+      'PLACES_UNAVAILABLE',
+      'Place validation is temporarily unavailable',
     )
     return
   }
