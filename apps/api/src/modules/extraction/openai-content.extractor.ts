@@ -12,10 +12,33 @@ import {
   EXTRACTION_SYSTEM_PROMPT,
 } from './extraction-prompt.js'
 
+type ProviderErrorMetadata = {
+  status: number | null
+  code: string | null
+  requestId: string | null
+}
+
+const readProviderErrorMetadata = (cause: unknown): ProviderErrorMetadata => {
+  if (typeof cause !== 'object' || cause === null) {
+    return { status: null, code: null, requestId: null }
+  }
+
+  const error = cause as Record<string, unknown>
+  return {
+    status: typeof error.status === 'number' ? error.status : null,
+    code: typeof error.code === 'string' ? error.code : null,
+    requestId:
+      typeof error.request_id === 'string' ? error.request_id : null,
+  }
+}
+
 export class ContentExtractionError extends Error {
+  readonly provider: ProviderErrorMetadata
+
   constructor(cause?: unknown) {
     super('The model did not return a valid content extraction', { cause })
     this.name = 'ContentExtractionError'
+    this.provider = readProviderErrorMetadata(cause)
   }
 }
 

@@ -3,6 +3,7 @@ import request from 'supertest'
 import { describe, expect, it, vi } from 'vitest'
 
 import { createApp } from '../src/app.js'
+import { ContentExtractionError } from '../src/modules/extraction/openai-content.extractor.js'
 
 const unusedAnalysisService = { analyze: vi.fn() }
 const unusedPlanningService = { create: vi.fn(), get: vi.fn() }
@@ -115,5 +116,42 @@ describe('createApp', () => {
       'https://youtu.be/dQw4w9WgXcQ',
       preferences,
     )
+  })
+
+  it('returns an actionable development error when OpenAI quota is exhausted', async () => {
+    const providerError = Object.assign(new Error('sensitive provider message'), {
+      status: 429,
+      code: 'insufficient_quota',
+      request_id: 'req_safe_id',
+    })
+    const analyze = vi
+      .fn()
+      .mockRejectedValue(new ContentExtractionError(providerError))
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const app = createApp({
+      analysisService: { analyze },
+      ingestionService: { ingest: vi.fn() },
+      planningService: unusedPlanningService,
+      webOrigin: 'http://localhost:5173',
+    })
+
+    const response = await request(app)
+      .post('/api/analyses')
+      .send({ url: 'https://youtu.be/dQw4w9WgXcQ' })
+      .expect(503)
+
+    expect(response.body).toEqual({
+      error: {
+        code: 'EXTRACTION_QUOTA_EXCEEDED',
+        message:
+          'OpenAI API quota is exhausted; check the project billing and usage limits',
+      },
+    })
+    expect(consoleError).toHaveBeenCalledWith('OpenAI extraction failed', {
+      status: 429,
+      code: 'insufficient_quota',
+      requestId: 'req_safe_id',
+    })
+    consoleError.mockRestore()
   })
 })

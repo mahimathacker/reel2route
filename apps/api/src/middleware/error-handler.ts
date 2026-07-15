@@ -72,6 +72,20 @@ export const errorHandler: ErrorRequestHandler = (
   }
 
   if (error instanceof ContentExtractionError) {
+    console.error('OpenAI extraction failed', error.provider)
+
+    if (error.provider.code === 'insufficient_quota') {
+      sendError(
+        response,
+        503,
+        'EXTRACTION_QUOTA_EXCEEDED',
+        process.env.NODE_ENV === 'production'
+          ? 'Content extraction capacity is temporarily unavailable'
+          : 'OpenAI API quota is exhausted; check the project billing and usage limits',
+      )
+      return
+    }
+
     sendError(
       response,
       502,

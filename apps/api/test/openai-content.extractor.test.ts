@@ -81,4 +81,28 @@ describe('OpenAIContentExtractor', () => {
 
     await expect(extractor.extract(content)).rejects.toThrow()
   })
+
+  it('preserves only safe provider diagnostics when the SDK fails', async () => {
+    const providerError = Object.assign(new Error('provider message'), {
+      status: 429,
+      code: 'insufficient_quota',
+      request_id: 'req_safe_id',
+      apiKey: 'must-not-be-copied',
+    })
+    const parse = vi.fn().mockRejectedValue(providerError)
+    const client = {
+      responses: { parse },
+    } as unknown as Pick<OpenAI, 'responses'>
+    const extractor = new OpenAIContentExtractor('test-key', 'gpt-5-mini', client)
+
+    const error = await extractor.extract(content).catch((cause: unknown) => cause)
+
+    expect(error).toBeInstanceOf(ContentExtractionError)
+    expect((error as ContentExtractionError).provider).toEqual({
+      status: 429,
+      code: 'insufficient_quota',
+      requestId: 'req_safe_id',
+    })
+    expect((error as ContentExtractionError).provider).not.toHaveProperty('apiKey')
+  })
 })
