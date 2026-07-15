@@ -1,5 +1,8 @@
-import { app } from './app.js'
+import { createApp } from './app.js'
 import { env } from './config/env.js'
+import { ingestionService } from './modules/ingestion/ingestion.composition.js'
+
+const app = createApp({ ingestionService, webOrigin: env.WEB_ORIGIN })
 
 const server = app.listen(env.PORT, (error) => {
   if (error) {

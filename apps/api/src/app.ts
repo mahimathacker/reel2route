@@ -2,23 +2,32 @@ import { healthResponseSchema } from '@reel2route/contracts'
 import cors from 'cors'
 import express from 'express'
 
-import { env } from './config/env.js'
+import { errorHandler } from './middleware/error-handler.js'
+import { createIngestionRouter } from './modules/ingestion/ingestion.router.js'
+import type { IngestionService } from './modules/ingestion/ingestion.service.js'
 
-export const app = express()
+type AppDependencies = {
+  ingestionService: Pick<IngestionService, 'ingest'>
+  webOrigin: string
+}
 
 const healthResponse = healthResponseSchema.parse({
   status: 'ok',
   service: 'reel2route-api',
 })
 
-app.disable('x-powered-by')
-app.use(
-  cors({
-    origin: env.WEB_ORIGIN,
-  }),
-)
-app.use(express.json({ limit: '1mb' }))
+export const createApp = ({ ingestionService, webOrigin }: AppDependencies) => {
+  const app = express()
 
-app.get('/api/health', (_request, response) => {
-  response.status(200).json(healthResponse)
-})
+  app.disable('x-powered-by')
+  app.use(cors({ origin: webOrigin }))
+  app.use(express.json({ limit: '1mb' }))
+
+  app.get('/api/health', (_request, response) => {
+    response.status(200).json(healthResponse)
+  })
+  app.use('/api/ingestions', createIngestionRouter(ingestionService))
+  app.use(errorHandler)
+
+  return app
+}

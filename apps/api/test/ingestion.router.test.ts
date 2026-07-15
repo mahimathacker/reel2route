@@ -1,10 +1,12 @@
 import type { SourceContent } from '@reel2route/contracts'
-import express, { type ErrorRequestHandler } from 'express'
+import express from 'express'
 import request from 'supertest'
 import { describe, expect, it, vi } from 'vitest'
-import { ZodError } from 'zod'
 
+import { errorHandler } from '../src/middleware/error-handler.js'
+import { UnsupportedContentUrlError } from '../src/modules/ingestion/content-url.js'
 import { createIngestionRouter } from '../src/modules/ingestion/ingestion.router.js'
+import { YouTubeVideoNotFoundError } from '../src/modules/ingestion/youtube-metadata.client.js'
 
 const sourceContent: SourceContent = {
   platform: 'youtube',
@@ -25,12 +27,6 @@ const createTestApp = (ingest: (url: string) => Promise<SourceContent>) => {
 
   app.use(express.json())
   app.use('/api/ingestions', createIngestionRouter({ ingest }))
-
-  const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => {
-    response.status(error instanceof ZodError ? 400 : 500).json({
-      error: error instanceof Error ? error.message : 'Unknown error',
-    })
-  }
 
   app.use(errorHandler)
 
@@ -55,23 +51,39 @@ describe('createIngestionRouter', () => {
     const ingest = vi.fn().mockResolvedValue(sourceContent)
     const app = createTestApp(ingest)
 
-    await request(app)
+    const response = await request(app)
       .post('/api/ingestions')
       .send({ url: 'not-a-url', unexpected: true })
       .expect(400)
 
+    expect(response.body).toEqual({
+      error: { code: 'INVALID_REQUEST', message: 'The request is invalid' },
+    })
     expect(ingest).not.toHaveBeenCalled()
   })
 
-  it('forwards asynchronous service failures to Express error handling', async () => {
-    const ingest = vi.fn().mockRejectedValue(new Error('Provider unavailable'))
+  it.each([
+    {
+      error: new UnsupportedContentUrlError('Only supported links are allowed'),
+      status: 422,
+      code: 'UNSUPPORTED_CONTENT_URL',
+      message: 'Only supported links are allowed',
+    },
+    {
+      error: new YouTubeVideoNotFoundError('dQw4w9WgXcQ'),
+      status: 404,
+      code: 'VIDEO_NOT_FOUND',
+      message: 'The YouTube video was not found',
+    },
+  ])('maps $code service failures', async ({ error, status, code, message }) => {
+    const ingest = vi.fn().mockRejectedValue(error)
     const app = createTestApp(ingest)
 
     const response = await request(app)
       .post('/api/ingestions')
       .send({ url: 'https://youtu.be/dQw4w9WgXcQ' })
-      .expect(500)
+      .expect(status)
 
-    expect(response.body).toEqual({ error: 'Provider unavailable' })
+    expect(response.body).toEqual({ error: { code, message } })
   })
 })
