@@ -90,4 +90,36 @@ describe('CostService', () => {
         ?.amountMinor,
     ).toBe(0)
   })
+
+  it('distinguishes short-haul and long-haul international routes', () => {
+    const service = new CostService()
+    const shortHaul = service.estimate(
+      planFor(0),
+      { ...preferences, origin: 'London, United Kingdom' },
+      'Paris, France',
+    )
+    const longHaul = service.estimate(
+      planFor(0),
+      { ...preferences, origin: 'Mumbai, India' },
+      'Paris, France',
+    )
+    const flight = (estimate: ReturnType<CostService['estimate']>) =>
+      estimate.lineItems.find(({ category }) => category === 'flights')
+
+    expect(flight(shortHaul)?.amountMinor).toBe(18_000)
+    expect(flight(longHaul)?.amountMinor).toBe(75_000)
+    expect(flight(longHaul)?.assumption).toContain('long-haul international')
+  })
+
+  it('applies a higher local-cost factor for Paris than Jaipur', () => {
+    const service = new CostService()
+    const paris = service.estimate(planFor(0), preferences, 'Paris, France')
+    const jaipur = service.estimate(planFor(0), preferences, 'Jaipur, India')
+    const accommodation = (estimate: ReturnType<CostService['estimate']>) =>
+      estimate.lineItems.find(({ category }) => category === 'accommodation')
+
+    expect(accommodation(paris)?.amountMinor).toBeGreaterThan(
+      accommodation(jaipur)?.amountMinor ?? 0,
+    )
+  })
 })

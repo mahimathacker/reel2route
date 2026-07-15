@@ -117,7 +117,7 @@ export class ItineraryService {
         persona,
         destination: analysis.extraction.destinationGuess,
         title: `${persona.name}: ${analysis.extraction.destinationGuess ?? 'Reel-inspired escape'}`,
-        summary: `${persona.summary} Stops are selected from validated reel references and ordered to reduce unnecessary travel.`,
+        summary: `${persona.summary} Stops are selected from validated source references and ordered to reduce unnecessary travel.`,
         days: Array.from({ length: preferences.days }, (_, dayIndex) => {
           const start = dayIndex * persona.dailyStopTarget
           const dayPlaces = ordered.slice(start, start + persona.dailyStopTarget)

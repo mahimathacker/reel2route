@@ -9,7 +9,8 @@ import {
 
 type PersonaRates = {
   domesticFlight: number
-  internationalFlight: number
+  shortHaulInternationalFlight: number
+  longHaulInternationalFlight: number
   accommodationNight: number
   foodDay: number
   activityStop: number
@@ -19,7 +20,8 @@ type PersonaRates = {
 const RATES: Record<PersonaId, PersonaRates> = {
   budget_explorer: {
     domesticFlight: 12_000,
-    internationalFlight: 45_000,
+    shortHaulInternationalFlight: 18_000,
+    longHaulInternationalFlight: 75_000,
     accommodationNight: 3_500,
     foodDay: 2_500,
     activityStop: 1_000,
@@ -27,7 +29,8 @@ const RATES: Record<PersonaId, PersonaRates> = {
   },
   comfort_traveller: {
     domesticFlight: 20_000,
-    internationalFlight: 70_000,
+    shortHaulInternationalFlight: 30_000,
+    longHaulInternationalFlight: 100_000,
     accommodationNight: 10_000,
     foodDay: 5_500,
     activityStop: 3_000,
@@ -35,7 +38,8 @@ const RATES: Record<PersonaId, PersonaRates> = {
   },
   premium_escape: {
     domesticFlight: 35_000,
-    internationalFlight: 120_000,
+    shortHaulInternationalFlight: 50_000,
+    longHaulInternationalFlight: 160_000,
     accommodationNight: 28_000,
     foodDay: 12_000,
     activityStop: 7_500,
@@ -49,16 +53,42 @@ const normalizeLocation = (value: string) =>
 const countryPart = (value: string) =>
   normalizeLocation(value.split(',').at(-1) ?? value)
 
-type FlightBand = 'same_destination' | 'domestic' | 'international' | 'unknown'
+type FlightBand =
+  | 'same_destination'
+  | 'domestic'
+  | 'short_haul_international'
+  | 'long_haul_international'
+  | 'unknown'
+
+const EUROPEAN_COUNTRIES = new Set([
+  'france',
+  'germany',
+  'italy',
+  'spain',
+  'united kingdom',
+  'uk',
+  'netherlands',
+  'belgium',
+  'switzerland',
+  'portugal',
+  'austria',
+])
 
 const flightBand = (origin: string, destination: string | null): FlightBand => {
   if (destination === null) return 'unknown'
   if (normalizeLocation(origin) === normalizeLocation(destination)) {
     return 'same_destination'
   }
-  return countryPart(origin) === countryPart(destination)
-    ? 'domestic'
-    : 'international'
+  const originCountry = countryPart(origin)
+  const destinationCountry = countryPart(destination)
+  if (originCountry === destinationCountry) return 'domestic'
+  if (
+    EUROPEAN_COUNTRIES.has(originCountry) &&
+    EUROPEAN_COUNTRIES.has(destinationCountry)
+  ) {
+    return 'short_haul_international'
+  }
+  return 'long_haul_international'
 }
 
 const flightEstimate = (
@@ -69,7 +99,10 @@ const flightEstimate = (
   const band = flightBand(origin, destination)
   if (band === 'same_destination') return 0
   if (band === 'domestic') return rates.domesticFlight
-  return rates.internationalFlight
+  if (band === 'short_haul_international') {
+    return rates.shortHaulInternationalFlight
+  }
+  return rates.longHaulInternationalFlight
 }
 
 const flightAssumption = (origin: string, destination: string | null) => {
@@ -77,10 +110,20 @@ const flightAssumption = (origin: string, destination: string | null) => {
   const labels: Record<FlightBand, string> = {
     same_destination: 'same destination; no flight added',
     domestic: 'domestic route band',
-    international: 'international route band',
-    unknown: 'unknown destination; conservative international route band',
+    short_haul_international: 'short-haul international route band',
+    long_haul_international: 'long-haul international route band',
+    unknown: 'unknown destination; conservative long-haul route band',
   }
   return `${origin} → ${destination ?? 'unknown destination'} is treated as a ${labels[band]}. Dates, airports, baggage, and booking window are unknown.`
+}
+
+const destinationMultiplier = (destination: string | null) => {
+  const normalized = normalizeLocation(destination ?? '')
+  if (normalized.includes('paris')) return 1.6
+  if (normalized.includes('london') || normalized.includes('new york')) return 1.5
+  if (normalized.includes('bali') || normalized.includes('ubud')) return 0.9
+  if (normalized.includes('jaipur')) return 0.8
+  return 1
 }
 
 const roomShare = (groupType: TripPreferences['groupType']) =>
@@ -94,6 +137,7 @@ export class CostService {
     recommendations: StopTourRecommendations[] = [],
   ): CostEstimate {
     const rates = RATES[plan.persona.id]
+    const localPriceFactor = destinationMultiplier(destination)
     const nights = Math.max(0, preferences.days - 1)
     const stopCount = plan.days.reduce((total, day) => total + day.stops.length, 0)
     const selectedTourPrices = recommendations
@@ -104,9 +148,10 @@ export class CostService {
     const unmatchedStops = Math.max(0, stopCount - selectedTourPrices.length)
     const activityCost =
       selectedTourPrices.reduce((total, price) => total + price, 0) +
-      unmatchedStops * rates.activityStop
+      unmatchedStops * Math.round(rates.activityStop * localPriceFactor)
     const accommodation = Math.round(
-      (rates.accommodationNight * nights) / roomShare(preferences.groupType),
+      (rates.accommodationNight * localPriceFactor * nights) /
+        roomShare(preferences.groupType),
     )
     const groupAssumption =
       preferences.groupType === 'solo'
@@ -138,16 +183,20 @@ export class CostService {
       {
         category: 'food' as const,
         label: `${preferences.days} days of food`,
-        amountMinor: rates.foodDay * preferences.days,
+        amountMinor: Math.round(
+          rates.foodDay * localPriceFactor * preferences.days,
+        ),
         confidence: 'medium' as const,
-        assumption: plan.persona.diningStyle,
+        assumption: `${plan.persona.diningStyle}. Includes a ${localPriceFactor.toFixed(1)}× destination price adjustment.`,
       },
       {
         category: 'local_transport' as const,
         label: `${preferences.days} days of local transport`,
-        amountMinor: rates.transportDay * preferences.days,
+        amountMinor: Math.round(
+          rates.transportDay * localPriceFactor * preferences.days,
+        ),
         confidence: 'medium' as const,
-        assumption: plan.persona.transportStyle,
+        assumption: `${plan.persona.transportStyle}. Includes a ${localPriceFactor.toFixed(1)}× destination price adjustment.`,
       },
     ]
 
@@ -162,6 +211,7 @@ export class CostService {
       assumptions: [
         'All amounts are per person and stored in USD cents.',
         'Travel dates are unknown, so seasonal price changes are excluded.',
+        `Accommodation, food, local transport, and unmatched activities use a ${localPriceFactor.toFixed(1)}× destination price adjustment.`,
         groupAssumption,
       ],
     })
