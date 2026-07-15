@@ -52,4 +52,16 @@ describe('PersonaService', () => {
     )
     expect(highest.id).toBe('premium_escape')
   })
+
+  it('grades alternative personas instead of assigning a shared fallback score', () => {
+    const personas = new PersonaService().generate({
+      origin: 'Mumbai, India',
+      days: 4,
+      budgetRange: 'budget',
+      groupType: 'solo',
+      pace: 'balanced',
+    })
+
+    expect(personas.map(({ fitScore }) => fitScore)).toEqual([95, 73, 42])
+  })
 })

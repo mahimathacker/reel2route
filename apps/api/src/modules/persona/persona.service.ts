@@ -42,21 +42,29 @@ const DEFINITIONS: readonly PersonaDefinition[] = [
   },
 ]
 
-const budgetFit = (persona: PersonaId, preferences: TripPreferences) => {
-  const matchingPersona: Record<TripPreferences['budgetRange'], PersonaId> = {
-    budget: 'budget_explorer',
-    moderate: 'comfort_traveller',
-    premium: 'premium_escape',
-  }
-  return matchingPersona[preferences.budgetRange] === persona ? 35 : 10
+const BUDGET_COMPATIBILITY: Record<TripPreferences['budgetRange'], Record<PersonaId, number>> = {
+  budget: { budget_explorer: 50, comfort_traveller: 30, premium_escape: 12 },
+  moderate: { budget_explorer: 28, comfort_traveller: 50, premium_escape: 28 },
+  premium: { budget_explorer: 12, comfort_traveller: 30, premium_escape: 50 },
 }
 
-const groupFit = (persona: PersonaId, group: TripPreferences['groupType']) => {
-  if (group === 'solo' && persona === 'budget_explorer') return 15
-  if ((group === 'couple' || group === 'family') && persona === 'comfort_traveller') return 15
-  if (group === 'couple' && persona === 'premium_escape') return 15
-  return 8
+const GROUP_COMPATIBILITY: Record<TripPreferences['groupType'], Record<PersonaId, number>> = {
+  solo: { budget_explorer: 25, comfort_traveller: 18, premium_escape: 12 },
+  couple: { budget_explorer: 16, comfort_traveller: 22, premium_escape: 25 },
+  friends: { budget_explorer: 23, comfort_traveller: 20, premium_escape: 12 },
+  family: { budget_explorer: 12, comfort_traveller: 25, premium_escape: 18 },
 }
+
+const PACE_COMPATIBILITY: Record<TripPreferences['pace'], Record<PersonaId, number>> = {
+  relaxed: { budget_explorer: 12, comfort_traveller: 22, premium_escape: 25 },
+  balanced: { budget_explorer: 20, comfort_traveller: 25, premium_escape: 18 },
+  packed: { budget_explorer: 25, comfort_traveller: 20, premium_escape: 12 },
+}
+
+const preferenceMatch = (persona: PersonaId, preferences: TripPreferences) =>
+  BUDGET_COMPATIBILITY[preferences.budgetRange][persona] +
+  GROUP_COMPATIBILITY[preferences.groupType][persona] +
+  PACE_COMPATIBILITY[preferences.pace][persona]
 
 const stopTarget = (base: number, pace: TripPreferences['pace']) =>
   Math.min(7, Math.max(2, base + (pace === 'packed' ? 1 : pace === 'relaxed' ? -1 : 0)))
@@ -79,7 +87,7 @@ export class PersonaService {
         diningStyle: definition.diningStyle,
         activityPricePreference: definition.activityPricePreference,
         dailyStopTarget: stopTarget(definition.baseStops, preferences.pace),
-        fitScore: 40 + budgetFit(definition.id, preferences) + groupFit(definition.id, preferences.groupType),
+        fitScore: preferenceMatch(definition.id, preferences),
         reason: reasonFor(definition, preferences),
       }),
     )
