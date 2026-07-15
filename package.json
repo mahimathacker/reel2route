@@ -4,8 +4,8 @@
   "private": true,
   "description": "Turn travel content into explainable, personalised trip plans.",
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
     "dev": "concurrently --kill-others-on-fail --names api,web --prefix-colors cyan,magenta \"npm run dev --workspace=@reel2route/api\" \"npm run dev --workspace=@reel2route/web\"",
