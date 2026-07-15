@@ -22,6 +22,7 @@ const plan = (): TripPlan => ({
     groupType: 'couple',
     pace: 'balanced',
   })[1]!,
+  destination: 'Jaipur, India',
   title: 'Comfort Jaipur',
   summary: 'A comfortable heritage day.',
   days: [
@@ -70,10 +71,43 @@ describe('TourMatcherService', () => {
     const result = new TourMatcherService(catalogue).matchPlan(plan())
     const cityPalaceTours = result.recommendations[0]?.tours
 
-    expect(cityPalaceTours).toHaveLength(2)
+    expect(cityPalaceTours).toHaveLength(1)
     expect(cityPalaceTours?.[0]?.id).toBe('jai-city-palace-heritage')
+    expect(cityPalaceTours?.filter(({ includedInEstimate }) => includedInEstimate)).toHaveLength(1)
+    expect(
+      cityPalaceTours?.every(({ id }) =>
+        catalogue
+          .filter((tour) => tour.personas.includes(plan().persona.id))
+          .some((tour) => tour.id === id),
+      ),
+    ).toBe(true)
     expect(cityPalaceTours?.every(({ source }) => source === 'mock')).toBe(true)
     expect(result.bookabilityScore).toBe(50)
+  })
+
+  it('never recommends a tour from another destination', () => {
+    const parisPlan = {
+      ...plan(),
+      destination: 'Paris, France',
+      days: [
+        {
+          ...plan().days[0]!,
+          stops: [
+            {
+              ...plan().days[0]!.stops[0]!,
+              placeId: 'mona-lisa',
+              name: 'Mona Lisa',
+              category: 'attraction' as const,
+            },
+          ],
+        },
+      ],
+    }
+    const result = new TourMatcherService(catalogue).matchPlan(parisPlan)
+
+    expect(
+      result.recommendations[0]?.tours.some(({ id }) => id.startsWith('bali-')),
+    ).toBe(false)
   })
 
   it('returns at most two recommendations per stop', () => {

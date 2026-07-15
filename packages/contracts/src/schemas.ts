@@ -145,6 +145,7 @@ export const itineraryDaySchema = z
 export const tripPlanSchema = z
   .object({
     persona: personaProfileSchema,
+    destination: z.string().trim().min(1).max(300).nullable(),
     title: z.string().trim().min(1).max(150),
     summary: z.string().trim().min(1).max(500),
     days: z.array(itineraryDaySchema).min(1).max(14),
@@ -196,6 +197,7 @@ export const tourRecommendationSchema = z
     durationMinutes: z.number().int().min(30).max(720),
     rating: z.number().min(0).max(5),
     source: z.literal('mock'),
+    includedInEstimate: z.boolean(),
     matchReason: z.string().trim().min(1).max(300),
   })
   .strict()

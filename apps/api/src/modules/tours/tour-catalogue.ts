@@ -6,6 +6,7 @@ const tourCatalogueEntrySchema = z
   .object({
     id: z.string().min(1),
     title: z.string().min(1),
+    destination: z.enum(['jaipur', 'paris', 'bali', 'global']),
     placeNames: z.array(z.string().min(1)),
     categories: z.array(z.string().min(1)).min(1),
     personas: z.array(

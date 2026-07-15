@@ -75,7 +75,9 @@ export class CostService {
     const nights = Math.max(0, preferences.days - 1)
     const stopCount = plan.days.reduce((total, day) => total + day.stops.length, 0)
     const selectedTourPrices = recommendations
-      .map(({ tours }) => tours[0]?.priceMinor)
+      .map(({ tours }) =>
+        tours.find(({ includedInEstimate }) => includedInEstimate)?.priceMinor,
+      )
       .filter((price): price is number => price !== undefined)
     const unmatchedStops = Math.max(0, stopCount - selectedTourPrices.length)
     const activityCost =

@@ -115,6 +115,7 @@ export class ItineraryService {
 
       return tripPlanSchema.parse({
         persona,
+        destination: analysis.extraction.destinationGuess,
         title: `${persona.name}: ${analysis.extraction.destinationGuess ?? 'Reel-inspired escape'}`,
         summary: `${persona.summary} Stops are selected from validated reel references and ordered to reduce unnecessary travel.`,
         days: Array.from({ length: preferences.days }, (_, dayIndex) => {

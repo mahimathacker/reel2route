@@ -14,6 +14,7 @@ const preferences: TripPreferences = {
 
 const planFor = (personaIndex: number): TripPlan => ({
   persona: new PersonaService().generate(preferences)[personaIndex]!,
+  destination: 'Jaipur, India',
   title: 'Jaipur plan',
   summary: 'A validated plan.',
   days: Array.from({ length: 4 }, (_, index) => ({
