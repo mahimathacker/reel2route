@@ -78,16 +78,16 @@ The web app runs at `http://localhost:5173` and the API at `http://localhost:400
 
 ## Worked YouTube example
 
-Use Rick Steves' [The Magnificent Louvre](https://www.youtube.com/watch?v=3P6M42aWo60), a real travel clip linked from the publisher's Paris guide. With the app running:
+Use Jules Anderson's [5 days in Paris, France travel vlog exploring ALL the sights & hidden gems](https://www.youtube.com/watch?v=bzch3VfNREA). It has public captions, day-by-day chapters, and a useful mix of landmarks, neighbourhoods, museums, cafés, gardens, and activities. With the app running:
 
 ```bash
 curl --request POST http://localhost:4000/api/trips \
   --header 'Content-Type: application/json' \
   --data '{
-    "url": "https://www.youtube.com/watch?v=3P6M42aWo60",
+    "url": "https://www.youtube.com/watch?v=bzch3VfNREA",
     "preferences": {
       "origin": "London",
-      "days": 3,
+      "days": 5,
       "budgetRange": "moderate",
       "groupType": "couple",
       "pace": "balanced"
@@ -97,7 +97,7 @@ curl --request POST http://localhost:4000/api/trips \
 
 The live response depends on current source metadata and Google Places results. A successful response contains:
 
-- source evidence for extracted mentions such as the Louvre;
+- source evidence for extracted mentions such as the Eiffel Tower, Arc de Triomphe, Musée d'Orsay, Montmartre, Sacré-Cœur, Versailles, and the Louvre;
 - Google place ID, coordinates, category, rating, and price level where available;
 - Budget Explorer, Comfort Traveller, and Premium Escape options;
 - five cost categories and a per-person total in USD;

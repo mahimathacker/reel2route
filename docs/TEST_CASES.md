@@ -4,9 +4,9 @@ These cases combine automated provider fixtures with live acceptance checks. Rec
 
 ## 1. YouTube travel video
 
-**Input:** Rick Steves, [The Magnificent Louvre](https://www.youtube.com/watch?v=3P6M42aWo60)
+**Input:** Jules Anderson, [5 days in Paris, France travel vlog exploring ALL the sights & hidden gems](https://www.youtube.com/watch?v=bzch3VfNREA)
 
-**Persona answers:** London · 3 days · moderate · couple · balanced
+**Persona answers:** Mumbai, India · 5 days · moderate · couple · balanced
 
 **Representative extraction:**
 
@@ -15,37 +15,51 @@ These cases combine automated provider fixtures with live acceptance checks. Rec
   "destinationGuess": "Paris, France",
   "places": [
     {
-      "name": "Louvre Museum",
-      "category": "attraction",
+      "name": "Arc de Triomphe",
+      "category": "landmark",
       "role": "independent_place",
       "parentPlaceName": null,
       "confidence": "high",
-      "mentionCount": 2,
+      "mentionCount": 3,
       "evidence": [
         {
-          "source": "title",
-          "text": "The Magnificent Louvre",
+          "source": "description",
+          "text": "The Arc de Triomphe including rooftop views",
+          "timestampSeconds": null
+        }
+      ]
+    },
+    {
+      "name": "Eiffel Tower",
+      "category": "landmark",
+      "role": "independent_place",
+      "parentPlaceName": null,
+      "confidence": "high",
+      "mentionCount": 3,
+      "evidence": [
+        {
+          "source": "description",
+          "text": "The best views of the Eiffel Tower sparkling at dark",
           "timestampSeconds": null
         }
       ]
     }
   ],
-  "vibes": ["art", "history", "culture"],
+  "vibes": ["iconic", "romantic", "art-filled", "historic"],
   "missingInformation": [
-    { "field": "trip_duration", "message": "The video does not define a trip duration." },
     { "field": "hotel_area", "message": "No accommodation area is recommended." },
     { "field": "travel_dates", "message": "No travel dates are provided." }
   ]
 }
 ```
 
-**Expected resolution:** Louvre Museum resolves to a Paris Google place with coordinates; rating and price level are included when Google returns them. If a place cannot be resolved, it remains visible in analysis but is not scheduled.
+**Observed live validation (July 15, 2026):** the source produced 17 place-like content mentions, 16 independently visitable candidates, and 8 resolved stops. Arc de Triomphe, Eiffel Tower, Jardin du Luxembourg, Musée d'Orsay, Versailles, Montmartre, Sacré-Cœur, and the 9th arrondissement resolved. Ambiguous names such as generic cruise/café references remained visible in analysis but were not scheduled.
 
 **Generated plan checks:**
 
 - Exactly three options: Budget Explorer, Comfort Traveller, Premium Escape.
 - The comfort option explains that its balanced pacing and mid-range assumptions match the supplied preference.
-- Each option covers three days, although sparse source content may leave some days with fewer stops rather than inventing places.
+- The Budget and Comfort options populate two source-backed days; Premium spreads the same evidence across three slower days. Remaining days stay explicitly open instead of introducing places absent from the video.
 - Cost output contains flights, accommodation, activities, food, and local transport, plus total per person.
 - Tour matches are labelled `mock`; packing advice is appropriate for three days and a couple.
 
