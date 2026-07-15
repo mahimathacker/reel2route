@@ -111,6 +111,17 @@ export const errorHandler: ErrorRequestHandler = (
     error instanceof GooglePlacesRequestError ||
     error instanceof GooglePlacesResponseError
   ) {
+    console.error(
+      'Google Places validation failed',
+      error instanceof GooglePlacesRequestError
+        ? {
+            type: 'request',
+            status: error.status,
+            providerStatus: error.providerStatus,
+            providerMessage: error.providerMessage,
+          }
+        : { type: 'response' },
+    )
     sendError(
       response,
       502,

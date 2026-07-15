@@ -24,10 +24,21 @@ const responseSchema = z.object({
   places: z.array(googlePlaceSchema).default([]),
 })
 
+const errorResponseSchema = z.object({
+  error: z.object({
+    status: z.string().max(100).optional(),
+    message: z.string().max(2_000).optional(),
+  }),
+})
+
 export type GooglePlace = z.infer<typeof googlePlaceSchema>
 
 export class GooglePlacesRequestError extends Error {
-  constructor(readonly status: number) {
+  constructor(
+    readonly status: number,
+    readonly providerStatus: string | null,
+    readonly providerMessage: string | null,
+  ) {
     super(`Google Places request failed with status ${status}`)
     this.name = 'GooglePlacesRequestError'
   }
@@ -76,7 +87,17 @@ export class GooglePlacesClient {
       },
     )
 
-    if (!response.ok) throw new GooglePlacesRequestError(response.status)
+    if (!response.ok) {
+      const payload: unknown = await response.json().catch(() => null)
+      const providerError = errorResponseSchema.safeParse(payload)
+      throw new GooglePlacesRequestError(
+        response.status,
+        providerError.success ? providerError.data.error.status ?? null : null,
+        providerError.success
+          ? providerError.data.error.message?.slice(0, 300) ?? null
+          : null,
+      )
+    }
 
     let payload: unknown
     try {

@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest'
 
 import {
   GooglePlacesClient,
-  GooglePlacesRequestError,
   GooglePlacesResponseError,
 } from '../src/modules/places/google-places.client.js'
 
@@ -44,16 +43,28 @@ describe('GooglePlacesClient', () => {
   it('rejects failed and malformed Google responses', async () => {
     const failed = new GooglePlacesClient(
       'key',
-      vi.fn<typeof fetch>().mockResolvedValue(new Response('', { status: 429 })),
+      vi.fn<typeof fetch>().mockResolvedValue(
+        Response.json(
+          {
+            error: {
+              status: 'RESOURCE_EXHAUSTED',
+              message: 'Quota exceeded for this project.',
+            },
+          },
+          { status: 429 },
+        ),
+      ),
     )
     const malformed = new GooglePlacesClient(
       'key',
       vi.fn<typeof fetch>().mockResolvedValue(Response.json({ places: [{}] })),
     )
 
-    await expect(failed.search('query')).rejects.toBeInstanceOf(
-      GooglePlacesRequestError,
-    )
+    await expect(failed.search('query')).rejects.toMatchObject({
+      status: 429,
+      providerStatus: 'RESOURCE_EXHAUSTED',
+      providerMessage: 'Quota exceeded for this project.',
+    })
     await expect(malformed.search('query')).rejects.toBeInstanceOf(
       GooglePlacesResponseError,
     )
