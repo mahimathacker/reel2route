@@ -1,0 +1,13 @@
+{
+  "name": "reel2route",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Turn travel content into explainable, personalised trip plans.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  }
+}
