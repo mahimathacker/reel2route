@@ -152,12 +152,4 @@ Tests cover URL parsing, provider fallbacks, prompt/output validation, place res
 - There is no authentication, background job queue, retry dashboard, or multi-instance database strategy because the assignment is local-only.
 - Public content, model output, API pricing, and place records change. Re-run the three documented cases immediately before recording the walkthrough.
 
-## Five-minute walkthrough outline
-
-1. Enter the worked YouTube URL and answer the five onboarding questions.
-2. Call out source evidence, confidence, and missing-information detection while processing completes.
-3. Compare why the three personas differ in pace, stops, transport, and spend.
-4. Open cost assumptions, mock tour matches, bookability, and packing advice.
-5. Refresh the saved trip URL, then briefly show provider boundaries and the test suite.
-
 The 100K-MAU operating model is documented in [docs/COST_ESTIMATE.md](docs/COST_ESTIMATE.md).
