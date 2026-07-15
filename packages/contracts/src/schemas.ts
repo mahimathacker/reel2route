@@ -12,6 +12,17 @@ export const evidenceSourceSchema = z.enum([
 
 export const confidenceLevelSchema = z.enum(['high', 'medium', 'low'])
 
+export const placeCategorySchema = z.enum([
+  'neighbourhood',
+  'restaurant',
+  'hotel',
+  'viewpoint',
+  'attraction',
+  'landmark',
+  'activity',
+  'other',
+])
+
 export const ingestContentRequestSchema = z
   .object({
     url: z.string().trim().pipe(z.url()),
@@ -63,6 +74,50 @@ export const sourceEvidenceSchema = z
   .object({
     source: evidenceSourceSchema,
     text: z.string().trim().min(1).max(500),
-    timestampSeconds: z.number().nonnegative().optional(),
+    timestampSeconds: z.number().nonnegative().nullable(),
+  })
+  .strict()
+
+export const extractedPlaceSchema = z
+  .object({
+    name: z.string().trim().min(1).max(300),
+    category: placeCategorySchema,
+    context: z.string().trim().min(1).max(500),
+    evidence: z.array(sourceEvidenceSchema).min(1).max(5),
+    confidence: confidenceLevelSchema,
+    mentionCount: z.number().int().positive(),
+  })
+  .strict()
+
+export const extractedActivitySchema = z
+  .object({
+    name: z.string().trim().min(1).max(300),
+    placeName: z.string().trim().min(1).max(300).nullable(),
+    evidence: z.array(sourceEvidenceSchema).min(1).max(5),
+    confidence: confidenceLevelSchema,
+  })
+  .strict()
+
+export const missingInformationSchema = z
+  .object({
+    field: z.enum([
+      'destination',
+      'trip_duration',
+      'hotel_area',
+      'origin',
+      'transport_mode',
+      'travel_dates',
+    ]),
+    message: z.string().trim().min(1).max(300),
+  })
+  .strict()
+
+export const contentExtractionSchema = z
+  .object({
+    destinationGuess: z.string().trim().min(1).max(300).nullable(),
+    places: z.array(extractedPlaceSchema).max(30),
+    activities: z.array(extractedActivitySchema).max(30),
+    vibes: z.array(z.string().trim().min(1).max(100)).max(10),
+    missingInformation: z.array(missingInformationSchema).max(6),
   })
   .strict()

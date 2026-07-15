@@ -1,8 +1,13 @@
 export {
   confidenceLevelSchema,
+  contentExtractionSchema,
   evidenceSourceSchema,
+  extractedActivitySchema,
+  extractedPlaceSchema,
   healthResponseSchema,
   ingestContentRequestSchema,
+  missingInformationSchema,
+  placeCategorySchema,
   sourceContentSchema,
   sourceEvidenceSchema,
   sourcePlatformSchema,
@@ -12,9 +17,14 @@ export {
 
 export type {
   ConfidenceLevel,
+  ContentExtraction,
   EvidenceSource,
+  ExtractedActivity,
+  ExtractedPlace,
   HealthResponse,
   IngestContentRequest,
+  MissingInformation,
+  PlaceCategory,
   SourceContent,
   SourceEvidence,
   SourcePlatform,
