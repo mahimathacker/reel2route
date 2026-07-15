@@ -123,4 +123,30 @@ describe('ItineraryService', () => {
       unscheduledPlaces.includes('Hidden Stepwell'),
     )).toBe(true)
   })
+
+  it('distributes available stops across the requested duration', () => {
+    const resolvedPlaces = Array.from({ length: 8 }, (_, index) =>
+      resolvedPlace(
+        `place-${index}`,
+        `Place ${index + 1}`,
+        26.9 + index * 0.001,
+        75.8 + index * 0.001,
+        4.5,
+      ),
+    )
+    const plans = new ItineraryService(new PersonaService()).generate(
+      { ...analysis, resolvedPlaces },
+      {
+        origin: 'Mumbai, India',
+        days: 5,
+        budgetRange: 'moderate',
+        groupType: 'couple',
+        pace: 'balanced',
+      },
+    )
+
+    expect(plans[1]?.days.map(({ stops }) => stops.length)).toEqual([
+      2, 2, 2, 1, 1,
+    ])
+  })
 })

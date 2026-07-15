@@ -66,4 +66,46 @@ describe('PlaceResolver', () => {
     expect(result.status).toBe('not_found')
     expect(result.source).toEqual(source)
   })
+
+  it('accepts a destination-compatible containing name', async () => {
+    const resolver = new PlaceResolver({
+      search: vi
+        .fn()
+        .mockResolvedValue([place('louvre', 'Louvre Museum')]),
+    })
+    const result = await resolver.resolve(
+      { ...source, name: 'Louvre', category: 'attraction' },
+      'Paris, France',
+    )
+
+    expect(result).toMatchObject({
+      status: 'resolved',
+      placeId: 'louvre',
+      displayName: 'Louvre Museum',
+    })
+  })
+
+  it('uses destination fit to reject a similarly named place elsewhere', async () => {
+    const paris = {
+      ...place('paris-pantheon', 'Panthéon'),
+      formattedAddress: 'Place du Panthéon, 75005 Paris, France',
+    }
+    const rome = {
+      ...place('rome-pantheon', 'Pantheon'),
+      formattedAddress: 'Piazza della Rotonda, Rome, Italy',
+    }
+    const resolver = new PlaceResolver({
+      search: vi.fn().mockResolvedValue([rome, paris]),
+    })
+
+    const result = await resolver.resolve(
+      { ...source, name: 'Pantheon' },
+      'Paris, France',
+    )
+
+    expect(result).toMatchObject({
+      status: 'resolved',
+      placeId: 'paris-pantheon',
+    })
+  })
 })

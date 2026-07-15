@@ -53,13 +53,13 @@ These cases combine automated provider fixtures with live acceptance checks. Rec
 }
 ```
 
-**Observed live validation (July 15, 2026):** the source produced 17 place-like content mentions, 16 independently visitable candidates, and 8 resolved stops. Arc de Triomphe, Eiffel Tower, Jardin du Luxembourg, Musée d'Orsay, Versailles, Montmartre, Sacré-Cœur, and the 9th arrondissement resolved. Ambiguous names such as generic cruise/café references remained visible in analysis but were not scheduled.
+**Observed live validation (July 15, 2026):** the source produced 22 place-like content mentions, 19 independently visitable candidates, and 13 resolved stops. Arc de Triomphe, Eiffel Tower, Notre-Dame, Panthéon, Jardin du Luxembourg, Musée d'Orsay, Palace of Versailles, Montmartre, Louvre Museum, Palais Garnier, Trocadéro, Mamiche, and Copains resolved. Ambiguous names such as a generic Seine cruise and cafés with competing branches remained visible in analysis but were not scheduled.
 
 **Generated plan checks:**
 
 - Exactly three options: Budget Explorer, Comfort Traveller, Premium Escape.
 - The comfort option explains that its balanced pacing and mid-range assumptions match the supplied preference.
-- The Budget and Comfort options populate two source-backed days; Premium spreads the same evidence across three slower days. Remaining days stay explicitly open instead of introducing places absent from the video.
+- All five days are populated from source-backed places. Thirteen validated stops are distributed `3, 3, 3, 2, 2` rather than being packed into the earliest days.
 - Cost output contains flights, accommodation, activities, food, and local transport, plus total per person.
 - Tour matches are labelled `mock`; packing advice is appropriate for three days and a couple.
 

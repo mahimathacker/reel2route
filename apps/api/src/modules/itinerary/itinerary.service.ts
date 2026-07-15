@@ -71,6 +71,22 @@ const orderByProximity = (ranked: SchedulablePlace[]) => {
   return ordered
 }
 
+const distributeAcrossDays = (
+  places: SchedulablePlace[],
+  dayCount: number,
+) => {
+  const baseSize = Math.floor(places.length / dayCount)
+  const daysWithExtraStop = places.length % dayCount
+  let offset = 0
+
+  return Array.from({ length: dayCount }, (_, dayIndex) => {
+    const size = baseSize + (dayIndex < daysWithExtraStop ? 1 : 0)
+    const dayPlaces = places.slice(offset, offset + size)
+    offset += size
+    return dayPlaces
+  })
+}
+
 const activityFor = (
   place: SchedulablePlace,
   activities: ExtractedActivity[],
@@ -111,6 +127,7 @@ export class ItineraryService {
       )
       const selected = ranked.slice(0, persona.dailyStopTarget * preferences.days)
       const ordered = orderByProximity(selected)
+      const placesByDay = distributeAcrossDays(ordered, preferences.days)
       const selectedIds = new Set(ordered.map(({ placeId }) => placeId))
 
       return tripPlanSchema.parse({
@@ -119,8 +136,7 @@ export class ItineraryService {
         title: `${persona.name}: ${analysis.extraction.destinationGuess ?? 'Reel-inspired escape'}`,
         summary: `${persona.summary} Stops are selected from validated source references and ordered to reduce unnecessary travel.`,
         days: Array.from({ length: preferences.days }, (_, dayIndex) => {
-          const start = dayIndex * persona.dailyStopTarget
-          const dayPlaces = ordered.slice(start, start + persona.dailyStopTarget)
+          const dayPlaces = placesByDay[dayIndex] ?? []
 
           return {
             day: dayIndex + 1,

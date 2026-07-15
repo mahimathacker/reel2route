@@ -16,14 +16,56 @@ const PRICE_LEVELS: Record<string, number> = {
 }
 
 const normalize = (value: string) =>
-  value.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, ' ').trim()
+  value
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/\p{M}/gu, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
 
 const similarity = (expected: string, actual: string) => {
   const left = new Set(normalize(expected).split(' ').filter(Boolean))
   const right = new Set(normalize(actual).split(' ').filter(Boolean))
   const intersection = [...left].filter((token) => right.has(token)).length
   const union = new Set([...left, ...right]).size
-  return union === 0 ? 0 : intersection / union
+  if (union === 0) return 0
+  if (intersection === left.size || intersection === right.size) {
+    return left.size === right.size ? 1 : 0.9
+  }
+  return intersection / union
+}
+
+const destinationFit = (destination: string | null, address?: string) => {
+  if (destination === null || address === undefined) return 0
+  const destinationTokens = normalize(destination).split(' ').filter(Boolean)
+  const addressTokens = new Set(normalize(address).split(' ').filter(Boolean))
+  if (destinationTokens.length === 0) return 0
+  return (
+    destinationTokens.filter((token) => addressTokens.has(token)).length /
+    destinationTokens.length
+  )
+}
+
+const CATEGORY_TYPES: Record<ExtractedPlace['category'], readonly string[]> = {
+  neighbourhood: ['neighborhood', 'locality', 'sublocality'],
+  restaurant: ['restaurant', 'cafe', 'bakery', 'bar'],
+  hotel: ['hotel', 'lodging'],
+  viewpoint: ['observation_deck', 'tourist_attraction', 'park'],
+  attraction: ['tourist_attraction', 'museum', 'art_gallery', 'park'],
+  landmark: [
+    'historical_landmark',
+    'monument',
+    'tourist_attraction',
+    'church',
+    'museum',
+  ],
+  activity: ['tourist_attraction', 'amusement_center', 'cultural_center'],
+  other: [],
+}
+
+const categoryFit = (source: ExtractedPlace, place: GooglePlace) => {
+  const expectedTypes = CATEGORY_TYPES[source.category]
+  return place.types.some((type) => expectedTypes.includes(type)) ? 1 : 0
 }
 
 const confidenceFor = (score: number): ConfidenceLevel =>
@@ -68,13 +110,31 @@ export class PlaceResolver {
     }
 
     const ranked = candidates
-      .map((place) => ({ place, score: similarity(source.name, place.displayName.text) }))
+      .map((place) => {
+        const nameScore = similarity(source.name, place.displayName.text)
+        const addressScore = destinationFit(
+          destinationGuess,
+          place.formattedAddress,
+        )
+        const typeScore = categoryFit(source, place)
+        return {
+          place,
+          nameScore,
+          addressScore,
+          score: nameScore * 0.7 + addressScore * 0.2 + typeScore * 0.1,
+        }
+      })
       .sort((left, right) => right.score - left.score)
     const best = ranked[0]
     if (best === undefined) throw new Error('Place ranking invariant failed')
 
     const runnerUpScore = ranked[1]?.score ?? 0
-    const ambiguous = best.score < 0.5 || best.score - runnerUpScore < 0.15
+    const runnerUp = ranked[1]
+    const ambiguous =
+      best.nameScore < 0.45 ||
+      (runnerUp !== undefined &&
+        best.score - runnerUpScore < 0.08 &&
+        best.addressScore - runnerUp.addressScore < 0.25)
 
     if (ambiguous) {
       return resolvedPlaceSchema.parse({

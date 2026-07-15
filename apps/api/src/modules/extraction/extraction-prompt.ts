@@ -42,6 +42,7 @@ Rules:
 - Classify a city, region, or country used only as the overall destination as destination_label.
 - Never represent a within_place item or destination_label as an independent itinerary stop.
 - Put experiences such as seeing an artwork in activities and link them to the parent venue with placeName.
+- Treat tours, cruises, shopping, meals, and other bookable experiences as activities unless the source names a physical operator or venue that can be independently validated.
 - Preserve the exact supporting snippet and its source type as evidence.
 - Use transcript timestamps when available; otherwise use null.
 - Count distinct mentions of each place across all supplied sources.
