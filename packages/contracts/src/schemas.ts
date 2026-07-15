@@ -152,6 +152,41 @@ export const tripPlanSchema = z
   })
   .strict()
 
+export const costCategorySchema = z.enum([
+  'flights',
+  'accommodation',
+  'activities',
+  'food',
+  'local_transport',
+])
+
+export const costLineItemSchema = z
+  .object({
+    category: costCategorySchema,
+    label: z.string().trim().min(1).max(150),
+    amountMinor: z.number().int().nonnegative(),
+    confidence: confidenceLevelSchema,
+    assumption: z.string().trim().min(1).max(500),
+  })
+  .strict()
+
+export const costEstimateSchema = z
+  .object({
+    currency: z.literal('USD'),
+    lineItems: z.array(costLineItemSchema).length(5),
+    totalPerPersonMinor: z.number().int().nonnegative(),
+    confidence: confidenceLevelSchema,
+    assumptions: z.array(z.string().trim().min(1).max(500)).min(1).max(10),
+  })
+  .strict()
+
+export const costedTripPlanSchema = z
+  .object({
+    plan: tripPlanSchema,
+    cost: costEstimateSchema,
+  })
+  .strict()
+
 export const extractedPlaceSchema = z
   .object({
     name: z.string().trim().min(1).max(300),

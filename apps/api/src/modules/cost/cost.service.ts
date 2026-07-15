@@ -1,0 +1,138 @@
+import {
+  costEstimateSchema,
+  type CostEstimate,
+  type PersonaId,
+  type TripPlan,
+  type TripPreferences,
+} from '@reel2route/contracts'
+
+type PersonaRates = {
+  domesticFlight: number
+  internationalFlight: number
+  accommodationNight: number
+  foodDay: number
+  activityStop: number
+  transportDay: number
+}
+
+const RATES: Record<PersonaId, PersonaRates> = {
+  budget_explorer: {
+    domesticFlight: 12_000,
+    internationalFlight: 45_000,
+    accommodationNight: 3_500,
+    foodDay: 2_500,
+    activityStop: 1_000,
+    transportDay: 1_200,
+  },
+  comfort_traveller: {
+    domesticFlight: 20_000,
+    internationalFlight: 70_000,
+    accommodationNight: 10_000,
+    foodDay: 5_500,
+    activityStop: 3_000,
+    transportDay: 3_500,
+  },
+  premium_escape: {
+    domesticFlight: 35_000,
+    internationalFlight: 120_000,
+    accommodationNight: 28_000,
+    foodDay: 12_000,
+    activityStop: 7_500,
+    transportDay: 10_000,
+  },
+}
+
+const normalizeLocation = (value: string) =>
+  value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+
+const countryPart = (value: string) =>
+  normalizeLocation(value.split(',').at(-1) ?? value)
+
+const flightEstimate = (
+  origin: string,
+  destination: string | null,
+  rates: PersonaRates,
+) => {
+  if (destination === null) return rates.internationalFlight
+  if (normalizeLocation(origin) === normalizeLocation(destination)) return 0
+  return countryPart(origin) === countryPart(destination)
+    ? rates.domesticFlight
+    : rates.internationalFlight
+}
+
+const roomShare = (groupType: TripPreferences['groupType']) =>
+  groupType === 'solo' ? 1 : 2
+
+export class CostService {
+  estimate(
+    plan: TripPlan,
+    preferences: TripPreferences,
+    destination: string | null,
+  ): CostEstimate {
+    const rates = RATES[plan.persona.id]
+    const nights = Math.max(0, preferences.days - 1)
+    const stopCount = plan.days.reduce((total, day) => total + day.stops.length, 0)
+    const accommodation = Math.round(
+      (rates.accommodationNight * nights) / roomShare(preferences.groupType),
+    )
+    const groupAssumption =
+      preferences.groupType === 'solo'
+        ? 'One traveller occupies one room.'
+        : 'Accommodation is shared by two travellers; exact group size was not collected.'
+
+    const lineItems = [
+      {
+        category: 'flights' as const,
+        label: 'Indicative return flight',
+        amountMinor: flightEstimate(preferences.origin, destination, rates),
+        confidence: 'low' as const,
+        assumption:
+          'Route-based mock estimate for a return economy fare; dates, baggage, and booking window are unknown.',
+      },
+      {
+        category: 'accommodation' as const,
+        label: `${nights} nights of accommodation`,
+        amountMinor: accommodation,
+        confidence: 'medium' as const,
+        assumption: `${plan.persona.accommodationStyle}. ${groupAssumption}`,
+      },
+      {
+        category: 'activities' as const,
+        label: `${stopCount} planned activities`,
+        amountMinor: rates.activityStop * stopCount,
+        confidence: 'low' as const,
+        assumption:
+          'Uses a persona-level allowance per scheduled stop until matched tour prices are available.',
+      },
+      {
+        category: 'food' as const,
+        label: `${preferences.days} days of food`,
+        amountMinor: rates.foodDay * preferences.days,
+        confidence: 'medium' as const,
+        assumption: plan.persona.diningStyle,
+      },
+      {
+        category: 'local_transport' as const,
+        label: `${preferences.days} days of local transport`,
+        amountMinor: rates.transportDay * preferences.days,
+        confidence: 'medium' as const,
+        assumption: plan.persona.transportStyle,
+      },
+    ]
+
+    return costEstimateSchema.parse({
+      currency: 'USD',
+      lineItems,
+      totalPerPersonMinor: lineItems.reduce(
+        (total, item) => total + item.amountMinor,
+        0,
+      ),
+      confidence: 'low',
+      assumptions: [
+        'All amounts are per person and stored in USD cents.',
+        'Travel dates are unknown, so seasonal price changes are excluded.',
+        groupAssumption,
+      ],
+    })
+  }
+}

@@ -5,6 +5,10 @@ import type {
   budgetRangeSchema,
   contentAnalysisSchema,
   contentExtractionSchema,
+  costCategorySchema,
+  costEstimateSchema,
+  costedTripPlanSchema,
+  costLineItemSchema,
   evidenceSourceSchema,
   extractedActivitySchema,
   extractedPlaceSchema,
@@ -43,6 +47,10 @@ export type ItineraryStop = z.infer<typeof itineraryStopSchema>
 export type ItineraryDay = z.infer<typeof itineraryDaySchema>
 export type TripPlan = z.infer<typeof tripPlanSchema>
 export type ContentAnalysis = z.infer<typeof contentAnalysisSchema>
+export type CostCategory = z.infer<typeof costCategorySchema>
+export type CostLineItem = z.infer<typeof costLineItemSchema>
+export type CostEstimate = z.infer<typeof costEstimateSchema>
+export type CostedTripPlan = z.infer<typeof costedTripPlanSchema>
 export type PlaceCategory = z.infer<typeof placeCategorySchema>
 export type ContentExtraction = z.infer<typeof contentExtractionSchema>
 export type ExtractedPlace = z.infer<typeof extractedPlaceSchema>
