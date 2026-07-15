@@ -170,11 +170,11 @@ Tests cover URL parsing, provider fallbacks, prompt/output validation, place res
 
 ## Possible next improvements
 
-- Add optional post-generation interest chips—such as art, food, history, neighbourhoods, viewpoints, and relaxation—without expanding the required onboarding beyond five questions.
+- Add optional post-generation interest chips, such as art, food, history, neighbourhoods, viewpoints, and relaxation, without expanding the required onboarding beyond five questions.
 - Combine source confidence, mention count, title/description evidence, persona-category affinity, Google attributes, and category diversity into an explainable place-selection score.
 - Explain why each unscheduled place was excluded, for example lower confidence, overlapping experience, distance, pace, or day-capacity constraints.
 - Preserve useful day groupings from chaptered videos while still adapting them to the user's requested duration and pace.
-- Add live dates, airport, party size, and baggage inputs only when the user asks for booking-grade estimates.
+- Add travel dates, origin airport, party size, and baggage inputs only when the user asks for booking-grade estimates.
 - Replace the mocked tour catalogue with live Viator or GetYourGuide inventory once API access, attribution rules, and commercial terms are confirmed.
 
 The 100K-MAU operating model is documented in [docs/COST_ESTIMATE.md](docs/COST_ESTIMATE.md).

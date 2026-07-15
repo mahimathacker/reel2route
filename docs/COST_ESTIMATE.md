@@ -73,7 +73,7 @@ The exact bill depends on billing account, region, negotiated discounts, field m
 
 Because the assignment permits a mocked tour catalogue, the submitted version uses local JSON and has $0 tour API call cost. A live Viator or GetYourGuide integration would require separate review of API access, commercial terms, rate limits, attribution requirements, commission economics, and availability risk.
 
-Unauthenticated Instagram page fetching has no published per-request charge, but it is operationally fragile. Production could incur proxy, retry, anti-abuse, or licensed-content-provider costs. Those are not silently counted as zero infrastructure cost—they are simply unknown until a compliant ingestion route is selected.
+Unauthenticated Instagram page fetching has no published per-request charge, but it is operationally fragile. Production could incur proxy, retry, anti-abuse, or licensed-content-provider costs. Those are not silently counted as zero infrastructure cost, they are simply unknown until a compliant ingestion route is selected.
 
 ## Practical optimization scenario
 

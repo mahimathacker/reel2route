@@ -126,7 +126,7 @@ Instagram public URLs are intentionally not pinned here because owners can delet
 
 - Budget Explorer gets the strongest preference-match score, public/shared transport assumptions, and lower food/stay allowances.
 - A packed preference permits more stops per day but never exceeds contract limits.
-- Mock tours rank by destination/place/category, persona budget, and rating—not catalogue order.
+- Mock tours rank by destination/place/category, persona budget, and rating, not catalogue order.
 - Bookability is the percentage of scheduled stops with at least one matched tour.
 
 **Pass condition:** a public Reel with accessible metadata returns `200`; blocked or sparse metadata produces an explicit limited-evidence result rather than fabricated places.
