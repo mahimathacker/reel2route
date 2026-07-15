@@ -1,9 +1,35 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  ingestContentRequestSchema,
   sourceEvidenceSchema,
   transcriptSegmentSchema,
 } from '../src/schemas.js'
+
+describe('ingestContentRequestSchema', () => {
+  it('trims and accepts a valid URL', () => {
+    const result = ingestContentRequestSchema.parse({
+      url: '  https://www.youtube.com/watch?v=abc123  ',
+    })
+
+    expect(result.url).toBe('https://www.youtube.com/watch?v=abc123')
+  })
+
+  it('rejects invalid URLs and unexpected fields', () => {
+    expect(
+      ingestContentRequestSchema.safeParse({
+        url: 'not-a-url',
+      }).success,
+    ).toBe(false)
+
+    expect(
+      ingestContentRequestSchema.safeParse({
+        url: 'https://www.youtube.com/watch?v=abc123',
+        userId: 'unexpected',
+      }).success,
+    ).toBe(false)
+  })
+})
 
 describe('sourceEvidenceSchema', () => {
   it('accepts transcript evidence with a timestamp', () => {
