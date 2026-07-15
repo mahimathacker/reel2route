@@ -3,6 +3,7 @@ import type { SourceContent } from '@reel2route/contracts'
 import type { ContentProvider } from './content-provider.js'
 import type { ParsedContentUrl } from './content-url.js'
 import type { InstagramMetadataClient } from './instagram-metadata.client.js'
+import type { InstagramYtDlpClient } from './instagram-ytdlp.client.js'
 
 export class InstagramProviderUrlError extends Error {
   constructor() {
@@ -16,6 +17,7 @@ export class InstagramProvider implements ContentProvider {
 
   constructor(
     private readonly metadataClient: Pick<InstagramMetadataClient, 'fetch'>,
+    private readonly fallbackClient?: Pick<InstagramYtDlpClient, 'fetch'>,
   ) {}
 
   readonly fetch = async (
@@ -26,7 +28,20 @@ export class InstagramProvider implements ContentProvider {
     }
 
     const result = await this.metadataClient.fetch(parsedUrl.canonicalUrl)
-    const metadata = result.status === 'available' ? result.metadata : null
+    const openGraph = result.status === 'available' ? result.metadata : null
+    const needsFallback = openGraph?.caption === null || (openGraph?.caption.length ?? 0) < 120
+    const fallbackResult = needsFallback
+      ? await this.fallbackClient?.fetch(parsedUrl.canonicalUrl)
+      : undefined
+    const fallback = fallbackResult?.status === 'available' ? fallbackResult.metadata : null
+    const metadata = {
+      title: openGraph?.title ?? fallback?.title ?? null,
+      caption:
+        (fallback?.caption?.length ?? 0) > (openGraph?.caption?.length ?? 0)
+          ? fallback?.caption ?? null
+          : openGraph?.caption ?? null,
+      author: openGraph?.author ?? fallback?.author ?? null,
+    }
 
     return {
       platform: this.platform,
@@ -40,14 +55,14 @@ export class InstagramProvider implements ContentProvider {
       author: metadata?.author ?? null,
       publishedAt: null,
       unavailableFields: [
-        ...(metadata?.title === null || metadata === null ? ['title' as const] : []),
+        ...(metadata.title === null ? ['title' as const] : []),
         'description',
         'transcript',
-        ...(metadata?.caption === null || metadata === null
+        ...(metadata.caption === null
           ? ['caption' as const]
           : []),
         'location_tags',
-        ...(metadata?.author === null || metadata === null
+        ...(metadata.author === null
           ? ['author' as const]
           : []),
         'published_at',

@@ -63,6 +63,33 @@ describe('InstagramProvider', () => {
     ])
   })
 
+  it('uses richer metadata-only fallback content when Open Graph is sparse', async () => {
+    const provider = new InstagramProvider(
+      {
+        fetch: vi.fn().mockResolvedValue({
+          status: 'available',
+          metadata: { title: 'Paris', caption: 'Paris ❤️', author: null },
+        }),
+      },
+      {
+        fetch: vi.fn().mockResolvedValue({
+          status: 'available',
+          metadata: {
+            title: 'Five days in Paris',
+            caption: 'Louvre Museum, Montmartre, and Canal Saint-Martin in five days.',
+            author: 'Traveller',
+          },
+        }),
+      },
+    )
+
+    const content = await provider.fetch(parsedInstagramUrl)
+
+    expect(content.title).toBe('Paris')
+    expect(content.caption).toContain('Louvre Museum')
+    expect(content.author).toBe('Traveller')
+  })
+
   it('rejects non-Instagram parsed URLs', async () => {
     const metadataFetch = vi.fn<InstagramMetadataClient['fetch']>()
     const provider = new InstagramProvider({ fetch: metadataFetch })

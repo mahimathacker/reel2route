@@ -72,7 +72,7 @@ Instagram public URLs are intentionally not pinned here because owners can delet
 **Recorded live URL:** `<add immediately before Loom>`  
 **Recorded trip ID:** `<add immediately before Loom>`
 
-**Automated fixture:** a public Reel page with `og:title`, `og:description`, `og:url`, and `instagram://media?id=ABC123` metadata. The provider normalizes this to platform `instagram`, external ID `ABC123`, caption text, canonical URL, and an empty transcript.
+**Automated fixture:** a public Reel page with Open Graph metadata. The provider normalizes this to platform `instagram`, caption text, canonical URL, and an empty transcript. When that metadata is blocked or sparse, an optional local `yt-dlp --skip-download` adapter attempts to retrieve richer caption metadata without downloading media.
 
 **Persona answers:** Mumbai · 4 days · budget · friends · packed
 

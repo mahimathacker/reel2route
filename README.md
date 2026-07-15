@@ -144,7 +144,7 @@ Tests cover URL parsing, provider fallbacks, prompt/output validation, place res
 
 ## Known limitations
 
-- Instagram ingestion reads public Open Graph metadata only. Instagram may require login, change markup, rate-limit requests, or remove a Reel. The app never downloads media and therefore cannot inspect video frames for visible text or location stickers.
+- Instagram ingestion reads public Open Graph metadata first and optionally uses a local `yt-dlp` metadata-only fallback for blocked or sparse captions. Install it with `brew install yt-dlp` on macOS if you want the fallback; the app still runs when it is absent. Instagram may require login, change markup, rate-limit requests, or remove a Reel. The app never downloads media and therefore cannot inspect video frames for visible text or location stickers.
 - YouTube transcripts depend on public caption availability and a non-official transcript adapter. A video can still be analysed from metadata when captions are unavailable.
 - Place resolution uses text search and a simple ambiguity policy; similarly named venues can require user confirmation in a production product.
 - Flight, accommodation, food, and local-transport amounts are persona heuristics, not dated inventory. Tours are realistic mock records and are not bookable.

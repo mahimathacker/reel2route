@@ -1,6 +1,7 @@
 import { env } from '../../config/env.js'
 import { InstagramMetadataClient } from './instagram-metadata.client.js'
 import { InstagramProvider } from './instagram.provider.js'
+import { InstagramYtDlpClient } from './instagram-ytdlp.client.js'
 import { IngestionService } from './ingestion.service.js'
 import { YouTubeMetadataClient } from './youtube-metadata.client.js'
 import { YouTubeProvider } from './youtube.provider.js'
@@ -12,7 +13,10 @@ const youtubeProvider = new YouTubeProvider(
   youtubeMetadataClient,
   youtubeTranscriptClient,
 )
-const instagramProvider = new InstagramProvider(new InstagramMetadataClient())
+const instagramProvider = new InstagramProvider(
+  new InstagramMetadataClient(),
+  new InstagramYtDlpClient(),
+)
 
 export const ingestionService = new IngestionService([
   youtubeProvider,
