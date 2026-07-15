@@ -61,7 +61,7 @@ These cases combine automated provider fixtures with live acceptance checks. Rec
 - The comfort option explains that its balanced pacing and mid-range assumptions match the supplied preference.
 - All five days are populated from source-backed places. Thirteen validated stops are distributed `3, 3, 3, 2, 2` rather than being packed into the earliest days.
 - Cost output contains flights, accommodation, activities, food, and local transport, plus total per person.
-- Tour matches are labelled `mock`; packing advice is appropriate for three days and a couple.
+- Tour matches are labelled `mock`; packing advice is appropriate for five days and a couple.
 
 **Pass condition:** `POST /api/trips` returns `200`, the evidence survives into the itinerary stop, all resolved coordinates validate, and `GET /api/trips/:tripId` returns the same payload.
 
@@ -129,7 +129,7 @@ Instagram public URLs are intentionally not pinned here because owners can delet
 - Mock tours rank by destination/place/category, persona budget, and rating—not catalogue order.
 - Bookability is the percentage of scheduled stops with at least one matched tour.
 
-**Pass condition:** a public Reel with accessible metadata returns `200`; an inaccessible/private Reel returns a clear ingestion error rather than fabricated content.
+**Pass condition:** a public Reel with accessible metadata returns `200`; blocked or sparse metadata produces an explicit limited-evidence result rather than fabricated places.
 
 ## 3. Sparse content edge case
 
@@ -157,10 +157,8 @@ Instagram public URLs are intentionally not pinned here because owners can delet
 **Expected product behavior:**
 
 - The app does not hallucinate landmarks or send invented names to Google Places.
-- It still returns the three persona shells only if the planning engine can represent empty days safely; every empty day clearly reflects missing source evidence.
-- Activity cost is zero, tour recommendations are empty, and bookability is `0`.
-- Flight and accommodation estimates are low confidence because the destination and dates are unknown.
-- The result prominently invites the user to try a richer Reel rather than presenting an empty plan as complete.
+- It does not present persona plans, tour recommendations, or a complete cost as if planning succeeded.
+- The result prominently explains the evidence gap and invites the user to try richer content.
 
 **Pass condition:** no ungrounded place appears. A graceful, evidence-honest result or a specific insufficient-content domain response is preferable to a plausible-looking hallucination.
 

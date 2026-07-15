@@ -4,17 +4,29 @@ Reel2Route turns a saved YouTube travel video or public Instagram Reel into thre
 
 ## Product flow
 
-```mermaid
-flowchart LR
-    A[YouTube URL or public Instagram Reel] --> B[Provider-based ingestion]
-    B --> C[Structured LLM extraction]
-    C --> D[Google Places resolution]
-    D --> E[Persona and itinerary engine]
-    E --> F[Cost engine]
-    E --> G[Mock tour matcher]
-    F --> H[Three trip options]
-    G --> H
-    H --> I[(SQLite)]
+```text
+YouTube URL or public Instagram Reel
+                    │
+                    ▼
+         Provider-based ingestion
+                    │
+                    ▼
+         Structured LLM extraction
+                    │
+                    ▼
+          Google Places resolution
+                    │
+                    ▼
+        Persona and itinerary engine
+                 ┌──┴──┐
+                 ▼     ▼
+          Cost engine  Mock tour matcher
+                 └──┬──┘
+                    ▼
+           Three trip options
+                    │
+                    ▼
+                  SQLite
 ```
 
 The extraction result includes places, activities, vibes, destination guess, source evidence, mention count, confidence, and a missing-information report. Only Google-resolved places enter an itinerary. The rest of the planning pipeline is deterministic so that the same analysis and preferences produce explainable plan differences.
@@ -25,7 +37,7 @@ The extraction result includes places, activities, vibes, destination guess, sou
 reel2route/
 ├── apps/
 │   ├── api/                 # Express API and domain modules
-│   │   ├── data/tours.json  # 24-item mock tour catalogue
+│   │   ├── data/tours.json  # 27-item mock tour catalogue
 │   │   ├── src/modules/     # Ingestion through persistence
 │   │   └── test/
 │   └── web/                 # React + Vite user experience
