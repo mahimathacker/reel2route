@@ -9,6 +9,8 @@ export {
   groupTypeSchema,
   healthResponseSchema,
   ingestContentRequestSchema,
+  itineraryDaySchema,
+  itineraryStopSchema,
   missingInformationSchema,
   pacePreferenceSchema,
   placeCandidateSchema,
@@ -22,6 +24,7 @@ export {
   sourcePlatformSchema,
   transcriptSegmentSchema,
   tripPreferencesSchema,
+  tripPlanSchema,
   unavailableSourceFieldSchema,
 } from './schemas.js'
 
@@ -36,6 +39,8 @@ export type {
   GroupType,
   HealthResponse,
   IngestContentRequest,
+  ItineraryDay,
+  ItineraryStop,
   MissingInformation,
   PacePreference,
   PlaceCandidate,
@@ -49,5 +54,6 @@ export type {
   SourcePlatform,
   TranscriptSegment,
   TripPreferences,
+  TripPlan,
   UnavailableSourceField,
 } from './types.js'

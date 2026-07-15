@@ -10,6 +10,8 @@ import type {
   extractedPlaceSchema,
   healthResponseSchema,
   ingestContentRequestSchema,
+  itineraryDaySchema,
+  itineraryStopSchema,
   missingInformationSchema,
   groupTypeSchema,
   pacePreferenceSchema,
@@ -23,6 +25,7 @@ import type {
   sourceEvidenceSchema,
   sourcePlatformSchema,
   tripPreferencesSchema,
+  tripPlanSchema,
   transcriptSegmentSchema,
   unavailableSourceFieldSchema,
 } from './schemas.js'
@@ -36,6 +39,9 @@ export type PacePreference = z.infer<typeof pacePreferenceSchema>
 export type PersonaId = z.infer<typeof personaIdSchema>
 export type PersonaProfile = z.infer<typeof personaProfileSchema>
 export type TripPreferences = z.infer<typeof tripPreferencesSchema>
+export type ItineraryStop = z.infer<typeof itineraryStopSchema>
+export type ItineraryDay = z.infer<typeof itineraryDaySchema>
+export type TripPlan = z.infer<typeof tripPlanSchema>
 export type ContentAnalysis = z.infer<typeof contentAnalysisSchema>
 export type PlaceCategory = z.infer<typeof placeCategorySchema>
 export type ContentExtraction = z.infer<typeof contentExtractionSchema>

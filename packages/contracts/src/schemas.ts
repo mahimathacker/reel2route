@@ -118,6 +118,40 @@ export const sourceEvidenceSchema = z
   })
   .strict()
 
+export const itineraryStopSchema = z
+  .object({
+    order: z.number().int().positive(),
+    placeId: z.string().trim().min(1),
+    name: z.string().trim().min(1).max(300),
+    category: placeCategorySchema,
+    latitude: z.number().min(-90).max(90),
+    longitude: z.number().min(-180).max(180),
+    suggestedActivity: z.string().trim().min(1).max(300).nullable(),
+    durationMinutes: z.number().int().min(30).max(480),
+    reason: z.string().trim().min(1).max(500),
+    evidence: z.array(sourceEvidenceSchema).min(1).max(5),
+  })
+  .strict()
+
+export const itineraryDaySchema = z
+  .object({
+    day: z.number().int().positive(),
+    theme: z.string().trim().min(1).max(150),
+    paceNote: z.string().trim().min(1).max(300),
+    stops: z.array(itineraryStopSchema).max(7),
+  })
+  .strict()
+
+export const tripPlanSchema = z
+  .object({
+    persona: personaProfileSchema,
+    title: z.string().trim().min(1).max(150),
+    summary: z.string().trim().min(1).max(500),
+    days: z.array(itineraryDaySchema).min(1).max(14),
+    unscheduledPlaces: z.array(z.string().trim().min(1).max(300)).max(30),
+  })
+  .strict()
+
 export const extractedPlaceSchema = z
   .object({
     name: z.string().trim().min(1).max(300),
