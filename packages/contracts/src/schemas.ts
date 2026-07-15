@@ -12,11 +12,17 @@ export const evidenceSourceSchema = z.enum([
 
 export const confidenceLevelSchema = z.enum(['high', 'medium', 'low'])
 
+export const ingestContentRequestSchema = z
+  .object({
+    url: z.string().trim().pipe(z.url()),
+  })
+  .strict()
+
 export const transcriptSegmentSchema = z
   .object({
     text: z.string().trim().min(1),
-    startSeconds: z.number().finite().nonnegative(),
-    durationSeconds: z.number().finite().nonnegative().optional(),
+    startSeconds: z.number().nonnegative(),
+    durationSeconds: z.number().nonnegative().optional(),
   })
   .strict()
 
@@ -57,6 +63,6 @@ export const sourceEvidenceSchema = z
   .object({
     source: evidenceSourceSchema,
     text: z.string().trim().min(1).max(500),
-    timestampSeconds: z.number().finite().nonnegative().optional(),
+    timestampSeconds: z.number().nonnegative().optional(),
   })
   .strict()
