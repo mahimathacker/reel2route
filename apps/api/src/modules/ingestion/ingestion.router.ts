@@ -1,6 +1,7 @@
 import { ingestContentRequestSchema } from '@reel2route/contracts'
 import { Router } from 'express'
 
+import { parseRequest } from '../../middleware/request-validation.js'
 import type { IngestionService } from './ingestion.service.js'
 
 type IngestionServicePort = Pick<IngestionService, 'ingest'>
@@ -11,7 +12,7 @@ export const createIngestionRouter = (
   const router = Router()
 
   router.post('/', async (request, response) => {
-    const input = ingestContentRequestSchema.parse(request.body)
+    const input = parseRequest(ingestContentRequestSchema, request.body)
     const content = await ingestionService.ingest(input.url)
 
     response.status(200).json(content)

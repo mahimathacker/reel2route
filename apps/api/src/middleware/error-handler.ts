@@ -17,6 +17,7 @@ import {
   GooglePlacesResponseError,
 } from '../modules/places/google-places.client.js'
 import { TripNotFoundError } from '../modules/planning/planning.service.js'
+import { RequestValidationError } from './request-validation.js'
 
 type ApiError = {
   error: {
@@ -38,8 +39,19 @@ export const errorHandler: ErrorRequestHandler = (
   response,
   _next,
 ) => {
-  if (error instanceof ZodError) {
+  if (error instanceof RequestValidationError) {
     sendError(response, 400, 'INVALID_REQUEST', 'The request is invalid')
+    return
+  }
+
+  if (error instanceof ZodError) {
+    console.error('Internal schema validation failed', error.issues)
+    sendError(
+      response,
+      500,
+      'INTERNAL_VALIDATION_ERROR',
+      'Generated trip data did not pass validation',
+    )
     return
   }
 
