@@ -7,10 +7,13 @@ import { createAnalysisRouter } from './modules/analysis/analysis.router.js'
 import type { AnalysisService } from './modules/analysis/analysis.service.js'
 import { createIngestionRouter } from './modules/ingestion/ingestion.router.js'
 import type { IngestionService } from './modules/ingestion/ingestion.service.js'
+import { createPlanningRouter } from './modules/planning/planning.router.js'
+import type { PlanningService } from './modules/planning/planning.service.js'
 
 type AppDependencies = {
   analysisService: Pick<AnalysisService, 'analyze'>
   ingestionService: Pick<IngestionService, 'ingest'>
+  planningService: Pick<PlanningService, 'create'>
   webOrigin: string
 }
 
@@ -22,6 +25,7 @@ const healthResponse = healthResponseSchema.parse({
 export const createApp = ({
   analysisService,
   ingestionService,
+  planningService,
   webOrigin,
 }: AppDependencies) => {
   const app = express()
@@ -35,6 +39,7 @@ export const createApp = ({
   })
   app.use('/api/analyses', createAnalysisRouter(analysisService))
   app.use('/api/ingestions', createIngestionRouter(ingestionService))
+  app.use('/api/trips', createPlanningRouter(planningService))
   app.use(errorHandler)
 
   return app

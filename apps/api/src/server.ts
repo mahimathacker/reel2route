@@ -2,10 +2,12 @@ import { createApp } from './app.js'
 import { env } from './config/env.js'
 import { analysisService } from './modules/analysis/analysis.composition.js'
 import { ingestionService } from './modules/ingestion/ingestion.composition.js'
+import { planningService } from './modules/planning/planning.composition.js'
 
 const app = createApp({
   analysisService,
   ingestionService,
+  planningService,
   webOrigin: env.WEB_ORIGIN,
 })
 

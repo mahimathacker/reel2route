@@ -216,6 +216,31 @@ export const tourMatchedPlanSchema = z
   })
   .strict()
 
+export const packingSuggestionSchema = z
+  .object({
+    luggage: z.string().trim().min(1).max(200),
+    essentials: z.array(z.string().trim().min(1).max(100)).min(2).max(10),
+    reason: z.string().trim().min(1).max(400),
+  })
+  .strict()
+
+export const plannedTripOptionSchema = z
+  .object({
+    plan: tripPlanSchema,
+    cost: costEstimateSchema,
+    recommendations: z.array(stopTourRecommendationsSchema),
+    bookabilityScore: z.number().int().min(0).max(100),
+    packingSuggestion: packingSuggestionSchema,
+  })
+  .strict()
+
+export const createTripRequestSchema = z
+  .object({
+    url: z.string().trim().pipe(z.url()),
+    preferences: tripPreferencesSchema,
+  })
+  .strict()
+
 export const extractedPlaceSchema = z
   .object({
     name: z.string().trim().min(1).max(300),
@@ -292,5 +317,12 @@ export const contentAnalysisSchema = z
     source: sourceContentSchema,
     extraction: contentExtractionSchema,
     resolvedPlaces: z.array(resolvedPlaceSchema).max(30),
+  })
+  .strict()
+
+export const tripPlanningResponseSchema = z
+  .object({
+    analysis: contentAnalysisSchema,
+    options: z.array(plannedTripOptionSchema).length(3),
   })
   .strict()

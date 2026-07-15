@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { createApp } from '../src/app.js'
 
 const unusedAnalysisService = { analyze: vi.fn() }
+const unusedPlanningService = { create: vi.fn() }
 
 const sourceContent: SourceContent = {
   platform: 'youtube',
@@ -32,6 +33,7 @@ describe('createApp', () => {
     const app = createApp({
       analysisService: unusedAnalysisService,
       ingestionService: { ingest: vi.fn() },
+      planningService: unusedPlanningService,
       webOrigin: 'http://localhost:5173',
     })
 
@@ -46,6 +48,7 @@ describe('createApp', () => {
     const app = createApp({
       analysisService: unusedAnalysisService,
       ingestionService: { ingest },
+      planningService: unusedPlanningService,
       webOrigin: 'http://localhost:5173',
     })
 
@@ -74,6 +77,7 @@ describe('createApp', () => {
     const app = createApp({
       analysisService: { analyze },
       ingestionService: { ingest: vi.fn() },
+      planningService: unusedPlanningService,
       webOrigin: 'http://localhost:5173',
     })
 
@@ -84,5 +88,32 @@ describe('createApp', () => {
 
     expect(analyze).toHaveBeenCalledWith('https://youtu.be/dQw4w9WgXcQ')
     expect(response.body).toEqual(analysis)
+  })
+
+  it('mounts the final trip-planning workflow', async () => {
+    const create = vi.fn().mockResolvedValue({ analysis: {}, options: [] })
+    const app = createApp({
+      analysisService: unusedAnalysisService,
+      ingestionService: { ingest: vi.fn() },
+      planningService: { create },
+      webOrigin: 'http://localhost:5173',
+    })
+    const preferences = {
+      origin: 'Mumbai, India',
+      days: 4,
+      budgetRange: 'moderate',
+      groupType: 'couple',
+      pace: 'balanced',
+    }
+
+    await request(app)
+      .post('/api/trips')
+      .send({ url: 'https://youtu.be/dQw4w9WgXcQ', preferences })
+      .expect(200)
+
+    expect(create).toHaveBeenCalledWith(
+      'https://youtu.be/dQw4w9WgXcQ',
+      preferences,
+    )
   })
 })

@@ -2,6 +2,7 @@ import {
   costEstimateSchema,
   type CostEstimate,
   type PersonaId,
+  type StopTourRecommendations,
   type TripPlan,
   type TripPreferences,
 } from '@reel2route/contracts'
@@ -68,10 +69,18 @@ export class CostService {
     plan: TripPlan,
     preferences: TripPreferences,
     destination: string | null,
+    recommendations: StopTourRecommendations[] = [],
   ): CostEstimate {
     const rates = RATES[plan.persona.id]
     const nights = Math.max(0, preferences.days - 1)
     const stopCount = plan.days.reduce((total, day) => total + day.stops.length, 0)
+    const selectedTourPrices = recommendations
+      .map(({ tours }) => tours[0]?.priceMinor)
+      .filter((price): price is number => price !== undefined)
+    const unmatchedStops = Math.max(0, stopCount - selectedTourPrices.length)
+    const activityCost =
+      selectedTourPrices.reduce((total, price) => total + price, 0) +
+      unmatchedStops * rates.activityStop
     const accommodation = Math.round(
       (rates.accommodationNight * nights) / roomShare(preferences.groupType),
     )
@@ -99,10 +108,9 @@ export class CostService {
       {
         category: 'activities' as const,
         label: `${stopCount} planned activities`,
-        amountMinor: rates.activityStop * stopCount,
-        confidence: 'low' as const,
-        assumption:
-          'Uses a persona-level allowance per scheduled stop until matched tour prices are available.',
+        amountMinor: activityCost,
+        confidence: selectedTourPrices.length === stopCount ? ('medium' as const) : ('low' as const),
+        assumption: `${selectedTourPrices.length} stops use selected mock-tour prices; ${unmatchedStops} unmatched stops use a persona-level allowance.`,
       },
       {
         category: 'food' as const,

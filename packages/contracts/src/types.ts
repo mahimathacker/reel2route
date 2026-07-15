@@ -9,6 +9,7 @@ import type {
   costEstimateSchema,
   costedTripPlanSchema,
   costLineItemSchema,
+  createTripRequestSchema,
   evidenceSourceSchema,
   extractedActivitySchema,
   extractedPlaceSchema,
@@ -19,16 +20,19 @@ import type {
   missingInformationSchema,
   groupTypeSchema,
   pacePreferenceSchema,
+  packingSuggestionSchema,
   placeCandidateSchema,
   placeCategorySchema,
   placeResolutionStatusSchema,
   personaIdSchema,
   personaProfileSchema,
+  plannedTripOptionSchema,
   resolvedPlaceSchema,
   sourceContentSchema,
   sourceEvidenceSchema,
   sourcePlatformSchema,
   tripPreferencesSchema,
+  tripPlanningResponseSchema,
   tripPlanSchema,
   stopTourRecommendationsSchema,
   tourMatchedPlanSchema,
@@ -59,6 +63,10 @@ export type CostCategory = z.infer<typeof costCategorySchema>
 export type CostLineItem = z.infer<typeof costLineItemSchema>
 export type CostEstimate = z.infer<typeof costEstimateSchema>
 export type CostedTripPlan = z.infer<typeof costedTripPlanSchema>
+export type CreateTripRequest = z.infer<typeof createTripRequestSchema>
+export type PackingSuggestion = z.infer<typeof packingSuggestionSchema>
+export type PlannedTripOption = z.infer<typeof plannedTripOptionSchema>
+export type TripPlanningResponse = z.infer<typeof tripPlanningResponseSchema>
 export type PlaceCategory = z.infer<typeof placeCategorySchema>
 export type ContentExtraction = z.infer<typeof contentExtractionSchema>
 export type ExtractedPlace = z.infer<typeof extractedPlaceSchema>
