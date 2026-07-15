@@ -30,9 +30,15 @@ export class InstagramProvider implements ContentProvider {
     const result = await this.metadataClient.fetch(parsedUrl.canonicalUrl)
     const openGraph = result.status === 'available' ? result.metadata : null
     const needsFallback = openGraph?.caption === null || (openGraph?.caption.length ?? 0) < 120
+    if (needsFallback && this.fallbackClient !== undefined) {
+      console.info('[instagram] Attempting yt-dlp metadata fallback')
+    }
     const fallbackResult = needsFallback
       ? await this.fallbackClient?.fetch(parsedUrl.canonicalUrl)
       : undefined
+    if (fallbackResult !== undefined) {
+      console.info(`[instagram] yt-dlp metadata fallback: ${fallbackResult.status}`)
+    }
     const fallback = fallbackResult?.status === 'available' ? fallbackResult.metadata : null
     const metadata = {
       title: openGraph?.title ?? fallback?.title ?? null,
